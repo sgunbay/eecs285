@@ -1,7 +1,6 @@
 package eecs285.proj4.jminjie;
 
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -12,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -25,40 +25,46 @@ public class MainGameFrame extends JFrame{
   JPanel HUDPanel;
   JPanel currentPositionPanel;
   JLabel currentPositionLabel;
-  JPanel [] gridSquares;
+  JPanel [][] gridSquares;
+  Tile[][] mapTiles;
   
   GridSquareMouseListener gridSquareMouseListener;
   Integer numGridSquares;
   final Integer ROWS;
   final Integer COLS;
-  final Integer SQUARESIZE = 22;
+  final Integer SQUARESIZE;
+  final Integer SCREEN_HEIGHT = 690;
+  final Integer SCREEN_WIDTH = 1190;
   
-  public MainGameFrame(String inTitle, Integer numRows, Integer numCols){
+  public MainGameFrame(String inTitle, Integer numRows, Integer numCols, Tile[][] tiles){
     super(inTitle);
-    setLayout(new BorderLayout());
-    mapPanel = new JPanel();
-    mapPanel.setLayout(new GridLayout(numRows, numCols));
-    numGridSquares = numRows * numCols;
     ROWS = numRows;
     COLS = numCols;
+    SQUARESIZE = Math.min(SCREEN_HEIGHT / ROWS, SCREEN_WIDTH / COLS);
+    setLayout(new BorderLayout());
+    mapPanel = new JPanel();
+    mapPanel.setLayout(new GridLayout(ROWS, COLS));
+    numGridSquares = numRows * numCols;
+    mapTiles = tiles;
     
     gridSquareMouseListener = new GridSquareMouseListener();
     
-    gridSquares = new JPanel[numGridSquares];
+    gridSquares = new JPanel[ROWS][COLS];
     
-    for (int i = 0; i < numGridSquares; i++){
-      gridSquares[i] = new JPanel();
-      gridSquares[i].setBackground(Color.GREEN.darker());
-      gridSquares[i].addMouseListener(gridSquareMouseListener);
-      gridSquares[i].setSize(30, 30);
-      gridSquares[i].setPreferredSize(new Dimension(SQUARESIZE, SQUARESIZE));
-      mapPanel.add(gridSquares[i]);
+    for (int i = 0; i < ROWS; i++){
+      for (int j = 0; j < COLS; j++){
+        gridSquares[i][j] = new JPanel();
+        gridSquares[i][j].setBackground(mapTiles[i][j].getColor());
+        gridSquares[i][j].addMouseListener(gridSquareMouseListener);
+        gridSquares[i][j].setPreferredSize(new Dimension(SQUARESIZE, SQUARESIZE));
+        mapPanel.add(gridSquares[i][j]);
+      }
     }
     mapPanel.setBorder(BorderFactory.createLineBorder(Color.black));
     add(mapPanel, BorderLayout.CENTER);
     
     auxPanel = new JPanel(new BorderLayout());
-    auxPanel.setPreferredSize(new Dimension(200, 600));
+    auxPanel.setPreferredSize(new Dimension(200, ROWS * SQUARESIZE));
     auxPanel.setBorder(BorderFactory.createLineBorder(Color.black));
     
     narrationPanel = new JPanel();
@@ -71,7 +77,7 @@ public class MainGameFrame extends JFrame{
     HUDPanel.add(new JLabel("HUD:", JLabel.CENTER), BorderLayout.NORTH);
     
     currentPositionLabel = new JLabel();
-    currentPositionLabel.setFont(new Font(currentPositionLabel.getName(), Font.PLAIN, 10));
+    currentPositionLabel.setFont(new Font(currentPositionLabel.getName(), Font.PLAIN, 9));
     currentPositionPanel = new JPanel();
     currentPositionPanel.add(currentPositionLabel);
     HUDPanel.add(currentPositionPanel, BorderLayout.SOUTH);
@@ -83,7 +89,6 @@ public class MainGameFrame extends JFrame{
     
     pack();
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setLocation(150, 10);
     setVisible(true);
   }
   
@@ -91,9 +96,9 @@ public class MainGameFrame extends JFrame{
   public class GridSquareMouseListener extends MouseAdapter{
   
     public void mouseClicked(MouseEvent e) {
-      String spaceNumber = "";
-      String rowNumber = "";
-      String colNumber = "";
+      String spaceNumber = null;
+      String rowNumber = null;
+      String colNumber = null;
       for (Integer i = 0; i < numGridSquares; i++)
         if (e.getSource() == gridSquares[i]){
           spaceNumber = i.toString();
@@ -107,18 +112,22 @@ public class MainGameFrame extends JFrame{
     }
   
     public void mouseEntered(MouseEvent e) {
-      for (int i = 0; i < numGridSquares; i++){
-        if (e.getSource() == gridSquares[i]){
-          gridSquares[i].setBackground(Color.GREEN.brighter());
-          currentPositionLabel.setText("(Row: " + getRow(i).toString() + " Col: " + getCol(i).toString() + ")");
+      for (Integer i = 0; i < ROWS; i++){
+        for (Integer j = 0; j < COLS; j++){
+          if (e.getSource() == gridSquares[i][j]){
+            gridSquares[i][j].setBackground(gridSquares[i][j].getBackground().brighter());
+            currentPositionLabel.setText("(Row: " + i + " Col: " + j + ")");
+          }
         }
       }
     }
   
     public void mouseExited(MouseEvent e) {
-      for (int i = 0; i < numGridSquares; i++){
-        if (e.getSource() == gridSquares[i])
-          gridSquares[i].setBackground(Color.GREEN.darker());
+      for (Integer i = 0; i < ROWS; i++){
+        for (Integer j = 0; j < COLS; j++){
+          if (e.getSource() == gridSquares[i][j])
+            gridSquares[i][j].setBackground(mapTiles[i][j].getColor());
+        }
       }
     }
     
