@@ -1,9 +1,11 @@
-package eecs285.proj4.jminjie;
+package com.eecs285.siegegame;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import java.awt.Color;
@@ -11,17 +13,16 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.BorderLayout;
-import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 public class MainGameFrame extends JFrame{
 
   private static final long serialVersionUID = 1L;
   JPanel mapPanel;
   JPanel auxPanel;
-  JPanel narrationPanel;
+  JScrollPane narrationPanel;
+  JTextArea narrationTextArea;
   JPanel HUDPanel;
   JPanel currentPositionPanel;
   JLabel currentPositionLabel;
@@ -35,6 +36,8 @@ public class MainGameFrame extends JFrame{
   final Integer SQUARESIZE;
   final Integer SCREEN_HEIGHT = 690;
   final Integer SCREEN_WIDTH = 1190;
+  final Integer AUX_SIZE = 200;
+  final Integer NARRATION_FONT_SIZE = 11;
   
   public MainGameFrame(String inTitle, Integer numRows, Integer numCols, Tile[][] tiles){
     super(inTitle);
@@ -64,20 +67,32 @@ public class MainGameFrame extends JFrame{
     add(mapPanel, BorderLayout.CENTER);
     
     auxPanel = new JPanel(new BorderLayout());
-    auxPanel.setPreferredSize(new Dimension(200, ROWS * SQUARESIZE));
-    auxPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+    auxPanel.setPreferredSize(new Dimension(AUX_SIZE, ROWS * SQUARESIZE));
+    auxPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
     
-    narrationPanel = new JPanel();
-    narrationPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-    narrationPanel.add(new JLabel("Narration:"));
+    narrationTextArea = new JTextArea("Welcome to Siege!\n");
+    narrationTextArea.setFont(new Font(narrationTextArea.getName(), Font.PLAIN, NARRATION_FONT_SIZE));
+    narrationTextArea.setEditable(false);
+    narrationTextArea.setWrapStyleWord(true);
+    narrationTextArea.setLineWrap(true);
+    narrationTextArea.setOpaque(false);
+    
+    narrationPanel = new JScrollPane();
+    narrationPanel.setBorder(BorderFactory.createCompoundBorder
+        (BorderFactory.createLineBorder(Color.BLACK), BorderFactory.createEmptyBorder(0, 3, 0, 0)));
+    narrationPanel.add(narrationTextArea);
+    narrationPanel.setViewportView(narrationTextArea);
+    narrationPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+    narrationPanel.getVerticalScrollBar().setPreferredSize(new Dimension(15, 0));
     
     HUDPanel = new JPanel(new BorderLayout());
-    HUDPanel.setPreferredSize(new Dimension(200, 200));
+    HUDPanel.setPreferredSize(new Dimension(AUX_SIZE, AUX_SIZE));
     HUDPanel.setBorder(BorderFactory.createLineBorder(Color.black));
     HUDPanel.add(new JLabel("HUD:", JLabel.CENTER), BorderLayout.NORTH);
     
     currentPositionLabel = new JLabel();
     currentPositionLabel.setFont(new Font(currentPositionLabel.getName(), Font.PLAIN, 9));
+    currentPositionLabel.setOpaque(false);
     currentPositionPanel = new JPanel();
     currentPositionPanel.add(currentPositionLabel);
     HUDPanel.add(currentPositionPanel, BorderLayout.SOUTH);
@@ -132,11 +147,9 @@ public class MainGameFrame extends JFrame{
     
   }
   
-  Integer getRow(Integer spaceNumber){
-    return spaceNumber / COLS;
-  }
-  Integer getCol(Integer spaceNumber){
-    return spaceNumber % COLS;
+  void printNarration(String add){
+    narrationTextArea.setText(narrationTextArea.getText() + add + '\n');
+    narrationTextArea.setCaretPosition(narrationTextArea.getDocument().getLength());
   }
 }
 
