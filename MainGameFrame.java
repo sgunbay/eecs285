@@ -96,19 +96,18 @@ public class MainGameFrame extends JFrame{
   public class GridSquareMouseListener extends MouseAdapter{
   
     public void mouseClicked(MouseEvent e) {
-      String spaceNumber = null;
       String rowNumber = null;
       String colNumber = null;
-      for (Integer i = 0; i < numGridSquares; i++)
-        if (e.getSource() == gridSquares[i]){
-          spaceNumber = i.toString();
-          rowNumber = getRow(i).toString();
-          colNumber = getCol(i).toString();
-        }
+      for (Integer i = 0; i < ROWS; i++)
+        for (Integer j = 0; j < COLS; j++)
+          if (e.getSource() == gridSquares[i][j]){
+            rowNumber = i.toString();
+            colNumber = j.toString();
+          }
       if(SwingUtilities.isLeftMouseButton(e))
-        System.out.println("left clicked on square " + spaceNumber + " (Row: " + rowNumber + " Col: " + colNumber + ")");
+        System.out.println("left clicked on square at: (Row: " + rowNumber + " Col: " + colNumber + ")");
       if(SwingUtilities.isRightMouseButton(e))
-        System.out.println("right clicked on square " + spaceNumber + " (Row: " + rowNumber + " Col: " + colNumber + ")");
+        System.out.println("right clicked on square at: (Row: " + rowNumber + " Col: " + colNumber + ")");
     }
   
     public void mouseEntered(MouseEvent e) {
