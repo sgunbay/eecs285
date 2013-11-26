@@ -1,4 +1,4 @@
-package eecs285.proj4;
+package com.eecs285.siegegame;
 
 public class UnitBasic extends Unit{
 	
@@ -6,8 +6,8 @@ public class UnitBasic extends Unit{
 		name = new String("Basic");
 		dmg = new Double(3*ATTACK);
 		spd = new Double(5);
-		inf = new Double(3);
-		cost = new Double(3);
+		inf = new Double(2);
+		cost = new Integer(3);
 	}
 	
 }

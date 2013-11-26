@@ -1,4 +1,4 @@
-package eecs285.proj4;
+package com.eecs285.siegegame;
 
 public class Coord {
 

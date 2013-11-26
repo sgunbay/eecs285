@@ -1,4 +1,4 @@
-package eecs285.proj4;
+package com.eecs285.siegegame;
 
 public class UnitExplorer extends Unit{
 
@@ -6,8 +6,8 @@ public class UnitExplorer extends Unit{
 		name = new String("Explorer");
 		dmg = new Double(1*ATTACK);
 		spd = new Double(5);
-		inf = new Double(5);
-		cost = new Double(2);
+		inf = new Double(4);
+		cost = new Integer(2);
 	}
 	
 }

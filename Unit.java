@@ -1,4 +1,4 @@
-package eecs285.proj4;
+package com.eecs285.siegegame;
 
 import static java.lang.System.*;
 
@@ -10,6 +10,6 @@ public abstract class Unit {
 	public Double dmg;
 	public Double spd;
 	public Double inf;
-	public Double cost;
+	public Integer cost;
 	
 }

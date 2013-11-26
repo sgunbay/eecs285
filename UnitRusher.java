@@ -1,4 +1,4 @@
-package eecs285.proj4;
+package com.eecs285.siegegame;
 
 public class UnitRusher extends Unit{
 
@@ -7,7 +7,7 @@ public class UnitRusher extends Unit{
 		dmg = new Double(2*ATTACK);
 		spd = new Double(7);
 		inf = new Double(2);
-		cost = new Double(2);
+		cost = new Integer(2);
 	}
 	
 }

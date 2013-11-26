@@ -1,11 +1,11 @@
-package eecs285.proj4;
+package com.eecs285.siegegame;
 
 import java.awt.Color;
 
 public class TileForest extends Tile {
 	
-	TileForest(){
-		super();
+	TileForest(Coord in_coord){
+		super("Forest",true,in_coord);
 	}
 	
 	public Double getSpdFactor(){
@@ -17,6 +17,6 @@ public class TileForest extends Tile {
 	}
 	
 	public Color getColor(){
-		return Color.GREEN.darker();
+		return Color.GREEN.darker().darker();
 	}
 }
