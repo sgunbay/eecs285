@@ -1,5 +1,6 @@
 package com.eecs285.siegegame;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -25,25 +26,30 @@ public class Siege {
 //    initialize connection to server (including IO streams)
 //    initServerConnection();
 
-      final int rows = 30;
+      final int rows = 25;
       final int cols = 40;
       
-      Tile[][] mapTiles = new Tile[30][40];
+      Tile[][] mapTiles = new Tile[rows][cols];
       for (int i = 0; i < rows; i++)
         for (int j = 0; j < cols; j++)
-          mapTiles[i][j] = new TilePlains();
+          mapTiles[i][j] = new TilePlains(new Coord(i, j));
       
-      MainGameFrame mainFrame = new MainGameFrame("Siege", 30, 40, mapTiles);
+      MainGameFrame mainFrame = new MainGameFrame("Siege", rows, cols, mapTiles);
       mainFrame.printNarration("Jordan added a bit of functionality");
       mainFrame.printNarration("Jordan tested the functionality");
       mainFrame.printNarration("Jordan is making sure the scrollbar works");
-      for (int i = 0; i < 30; i++)
-        mainFrame.printNarration("Filling in 30 lines...");
+      for (int i = 0; i < 50; i++)
+        mainFrame.printNarration("Filling in 50 lines...");
       mainFrame.printNarration("Jordan ended turn");
 //      while (true) {
 //        String fromServer = in.readLine();
 //        System.out.println("FROM SERVER: " + fromServer);
 //        }
+      
+      Coord oneOne = new Coord(1, 1);
+      Tile plains = new TilePlains(oneOne);
+      mainFrame.updateGridSquare(oneOne, plains);
+
     }
 
     private static void initServerConnection() throws Exception {
