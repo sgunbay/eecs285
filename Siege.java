@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
+import com.eecs285.siegegame.ActionParser.ActionType;
+
 public class Siege {
 
 // These are required for the classes to work properly:
@@ -20,7 +22,10 @@ public class Siege {
     static BufferedReader in;
     static DataOutputStream out;
     static int portNum = 45000;
+    
+    //change this to whatever IP address the server has
     private final static String IPaddress = "127.0.0.1"; // localhost
+                                                         
 
     public static void main(String args[]) throws Exception {
 //    initialize connection to server (including IO streams)
@@ -41,15 +46,39 @@ public class Siege {
       for (int i = 0; i < 50; i++)
         mainFrame.printNarration("Filling in 50 lines...");
       mainFrame.printNarration("Jordan ended turn");
-//      while (true) {
-//        String fromServer = in.readLine();
-//        System.out.println("FROM SERVER: " + fromServer);
-//        }
+
       
       Coord oneOne = new Coord(1, 1);
       Tile plains = new TilePlains(oneOne);
       mainFrame.updateGridSquare(oneOne, plains);
-
+      
+//    while (true) {
+//    String fromServer = in.readLine();
+//    System.out.println("FROM SERVER: " + fromServer);
+//    }
+      
+      //max testing ActionParser
+      /*
+      String test = "something sinister attacks something good";
+      ActionType atype = ActionParser.getActionType(test);
+      System.out.println(test);
+      if(atype == ActionType.ATTACK) System.out.println("Attack");
+      
+      test = "Player 1 captures city from Player 2";
+      atype = ActionParser.getActionType(test);
+      System.out.println(test);
+      if(atype == ActionType.CAPTURE_CITY) System.out.println("Capture city");
+      
+      test = "asdfajsdflkja ends turn";
+      atype = ActionParser.getActionType(test);
+      System.out.println(test);
+      if(atype == ActionType.END_TURN) System.out.println("End turn");
+      
+      Coord coord = ActionParser.getFirstCoordinate("Army at (6, 1) attacked army at (19,51)");
+      System.out.println("row = " + coord.row + "   col = " + coord.col);
+      coord = ActionParser.getSecondCoordinate("Army at (6, 1) attacked army at (19,51)");
+      System.out.println("row = " + coord.row + "   col = " + coord.col); 
+      */
     }
 
     private static void initServerConnection() throws Exception {
