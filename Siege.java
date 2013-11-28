@@ -47,53 +47,59 @@ public class Siege {
         Coord oneOne = new Coord(1, 1);
         Tile plains = new TilePlains(oneOne);
         mainFrame.updateGridSquare(oneOne, plains);
-        
-        //testing max
-        //sendToServer("someone attacks someone else");
+
+        // testing max
+        // sendToServer("someone attacks someone else");
         sendToServer("Player's army at (1, 2) attacks player's army/city at (3, 4)");
 
         while (true) {
+            // Get string from server
             String fromServer = in.readLine();
-            System.out.println("FROM SERVER: " + fromServer);
-            fromServer = trimServerString(fromServer); 
-            
+            // Remove unwanted spaces in string
+            fromServer = trimServerString(fromServer);
+
+            // Get action type from string and initialize variables
             ActionType atype = ActionParser.getActionType(fromServer);
             Coord attacker = null, target = null;
             Coord city = null, resource = null;
-            
-            if(atype == null) {
+
+            // If atype is null, then there was an issue reading the string
+            if (atype == null) {
                 System.out.println("ERROR: atype is null");
                 System.exit(-1);
             }
-            
-            switch(atype) {
+
+            // perform action depending on what server string specifies
+            switch (atype) {
             case ATTACK:
                 System.out.println("Attack");
                 attacker = ActionParser.getFirstCoordinate(fromServer);
                 target = ActionParser.getSecondCoordinate(fromServer);
-                System.out.println("attacker at (" + attacker.row + ", " + attacker.col + ")");
-                System.out.println("target at (" + target.row + ", " + target.row + ")");
-                
+                System.out.println("attacker at (" + attacker.row + ", "
+                        + attacker.col + ")");
+                System.out.println("target at (" + target.row + ", "
+                        + target.row + ")");
+
                 break;
             case CAPTURE_CITY:
                 System.out.println("Capture City");
                 city = ActionParser.getFirstCoordinate(fromServer);
-                
+
                 break;
             case CAPTURE_RESOURCE:
                 System.out.println("Capture Resource");
                 resource = ActionParser.getFirstCoordinate(fromServer);
-                
+
                 break;
             case CITY_LIBERATED:
                 System.out.println("Liberate City");
                 city = ActionParser.getFirstCoordinate(fromServer);
-                
+
                 break;
             case CITY_UNDER_SIEGE:
                 System.out.println("Siege City");
                 city = ActionParser.getFirstCoordinate(fromServer);
-                
+
                 break;
             case END_TURN:
                 System.out.println("End Turn");
@@ -102,7 +108,7 @@ public class Siege {
                 System.out.println("Lose Units");
                 break;
             case MERGE_ARMY:
-                System.out.println("Merge Army");               
+                System.out.println("Merge Army");
                 break;
             case MOVE_ARMY:
                 System.out.println("Move Army");
@@ -113,13 +119,13 @@ public class Siege {
             case RESOURCE_RECAPTURED:
                 System.out.println("Recapture Resource");
                 resource = ActionParser.getFirstCoordinate(fromServer);
-                
+
                 break;
             case RESOURCE_UNDER_CONFLICT:
                 System.out.println("Resource Contested");
                 resource = ActionParser.getFirstCoordinate(fromServer);
-                
-                break; 
+
+                break;
             case PLAYER_DEFEATED:
                 System.out.println("Player Defeated");
                 break;
@@ -127,26 +133,28 @@ public class Siege {
                 System.out.println("Player Wins");
                 break;
             default:
-                System.out.println("ERROR: Action did not specify a known ActionType");
+                System.out
+                        .println("ERROR: Action did not specify a known ActionType");
                 System.exit(-1);
-                break;           
-            }            
+                break;
+            }
         }
     }
 
     private static String trimServerString(String fromServer) {
         // string from server has 3 space chars between each usable char
         // need to trim the spaces to use string.contains() method
-        
+
         String usableData = "";
-        for(int i = 0; i < fromServer.length(); i++)
-            if((i + 1)%4 == 0) //every fourth character is useful
+        for (int i = 0; i < fromServer.length(); i++)
+            if ((i + 1) % 4 == 0) // every fourth character is useful
                 usableData += String.valueOf(fromServer.charAt(i));
-        
+
         return usableData;
     }
 
     private static void initServerConnection() throws Exception {
+        // create a connection to the server and initialize IO streams
         Socket cSocket = new Socket(IPaddress, portNum);
         out = new DataOutputStream(cSocket.getOutputStream());
         DataInputStream dis = new DataInputStream(cSocket.getInputStream());
@@ -154,6 +162,7 @@ public class Siege {
     }
 
     public static void sendToServer(String data) throws IOException {
+        // send the string parameter to the server
         data += '\n';
         out.writeChars(data);
     }
