@@ -16,12 +16,12 @@ public class ActionParser {
         RESOURCE_RECAPTURED,
         PLAYER_DEFEATED,
         PLAYER_WINS,
-        END_TURN
+        END_TURN,
+        NAME_CHANGE
     }
 
     static ActionType getActionType(String input) {
         // returns the action type present in the input string
-
         // Army ActionTypes
         if (input.contains("attacks"))
             return ActionType.ATTACK;
@@ -57,6 +57,8 @@ public class ActionParser {
             return ActionType.PLAYER_DEFEATED;
         else if (input.contains("ends turn"))
             return ActionType.END_TURN;
+        else if(input.contains("changed their name to"))
+            return ActionType.NAME_CHANGE;
 
         return null;
     }

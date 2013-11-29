@@ -50,16 +50,22 @@ public class Siege {
 
         // testing max
         // sendToServer("someone attacks someone else");
-        sendToServer("Player's army at (1, 2) attacks player's army/city at (3, 4)");
+        // sendToServer("Player's army at (1, 2) attacks player's army/city at (3, 4)");
 
         while (true) {
-            // Get string from server
+            //Get string from server            
             String fromServer = in.readLine();
-            // Remove unwanted spaces in string
-            fromServer = trimServerString(fromServer);
-
+            
+            // Remove any non letter/digit/space chars from string
+            String usableData = "";
+            for(int i = 0; i < fromServer.length(); i++) {
+                Character temp = fromServer.charAt(i);
+                if(Character.isLetterOrDigit(temp) || temp == ' ')
+                    usableData += temp;
+            }
+            
             // Get action type from string and initialize variables
-            ActionType atype = ActionParser.getActionType(fromServer);
+            ActionType atype = ActionParser.getActionType(usableData);
             Coord attacker = null, target = null;
             Coord city = null, resource = null;
 
@@ -132,25 +138,15 @@ public class Siege {
             case PLAYER_WINS:
                 System.out.println("Player Wins");
                 break;
+            case NAME_CHANGE:
+                System.out.println("Name change occured");
+                break;
             default:
-                System.out
-                        .println("ERROR: Action did not specify a known ActionType");
+                System.out.println("ERROR: Action did not specify a known ActionType");
                 System.exit(-1);
                 break;
             }
         }
-    }
-
-    private static String trimServerString(String fromServer) {
-        // string from server has 3 space chars between each usable char
-        // need to trim the spaces to use string.contains() method
-
-        String usableData = "";
-        for (int i = 0; i < fromServer.length(); i++)
-            if ((i + 1) % 4 == 0) // every fourth character is useful
-                usableData += String.valueOf(fromServer.charAt(i));
-
-        return usableData;
     }
 
     private static void initServerConnection() throws Exception {
