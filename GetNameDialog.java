@@ -17,42 +17,9 @@ import javax.swing.SwingConstants;
 
 public class GetNameDialog extends JDialog {
 
-<<<<<<< HEAD
-    JTextField inputField;
-    JButton okButton;
-    private static final long serialVersionUID = 1L;
-=======
   JTextField inputField;
   JButton okButton;
   private static final long serialVersionUID = 1L;
-  
-  public GetNameDialog(JFrame mainFrame){
-    super(mainFrame, "Siege", true);
-    ImageIcon icon = new ImageIcon("src/Resources/castleIcon3.png");
-    setIconImage(icon.getImage());
-    
-    ImageIcon title = new ImageIcon("src/Resources/titlecard.png");
-    
-    JPanel topUpperPan = new JPanel(new FlowLayout());
-    JPanel topLowerPan = new JPanel(new FlowLayout());
-    JPanel topPan = new JPanel(new BorderLayout());
-    JPanel bottomPan = new JPanel(new FlowLayout());
-    setLayout(new BorderLayout());
-    okButton = new JButton("OK");
-    bottomPan.add(okButton);
-    topUpperPan.add(new JLabel("Player name:", SwingConstants.LEFT));
-    inputField = new JTextField(40);
-    topLowerPan.add(inputField);
-    
-    topPan.add(new JLabel(title), BorderLayout.NORTH);
-    topPan.add(topUpperPan, BorderLayout.CENTER);
-    topPan.add(topLowerPan, BorderLayout.SOUTH);
-    add(topPan, BorderLayout.CENTER);
-    add(bottomPan, BorderLayout.SOUTH);
-    
-    buttonListener listener = new buttonListener();
-    okButton.addActionListener(listener);
->>>>>>> 81907405a7c8e98662e189fdb1301b1e4e625e99
 
     public GetNameDialog(JFrame mainFrame) {
         super(mainFrame, "", true);
