@@ -21,7 +21,9 @@ public class GetNameDialog extends JDialog {
   private static final long serialVersionUID = 1L;
   
   public GetNameDialog(JFrame mainFrame){
-    super(mainFrame, "", true);
+    super(mainFrame, "Siege", true);
+    ImageIcon icon = new ImageIcon("src/Resources/castleIcon3.png");
+    setIconImage(icon.getImage());
     
     ImageIcon title = new ImageIcon("src/Resources/titlecard.png");
     
