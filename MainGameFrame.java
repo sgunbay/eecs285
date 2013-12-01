@@ -769,7 +769,10 @@ public class MainGameFrame extends JFrame{
   void printMyCityPanel(Tile cityTile){
     /*
     String owner = Siege.players[cityTile.owner].name;
-    cityStatus_CITY.setText("City is occupied by " + owner);
+    if (cityTile.infers)
+      cityStatus_CITY.setText(owner + "'s city is under siege");
+    else
+      cityStatus_CITY.setText("City is occupied by " + owner);
     strengthLabelMyCity.setText("Occuyping army strength: " + cityTile.getOccupant().getStrength());
     numberOfUnitsLabelMyCity.setText("Number of units: " + cityTile.getOccupant().units.size());
     Integer b = 0, e = 0, a = 0, r = 0;
@@ -793,6 +796,8 @@ public class MainGameFrame extends JFrame{
   void printEnemyCityPanel(Tile cityTile){
     /*
     String owner = Siege.players[cityTile.owner].name;
+    if (cityTile.infers)
+      cityStatus_CITY.setText(owner + "'s city is under siege");
     cityStatus_CITY.setText("City is occupied by " + owner);
     strengthLabelMyCity.setText("Occuyping army strength: " + cityTile.getOccupant().getStrength());
     numberOfUnitsLabelMyCity.setText("Number of units: " + cityTile.getOccupant().units.size());
