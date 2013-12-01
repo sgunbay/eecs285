@@ -53,6 +53,7 @@ public class MainGameFrame extends JFrame{
   JPanel [][] gridSquares;
   Tile[][] mapTiles;
   Tile currentSelected;
+  Tile prevSelected;
   
   GridSquareMouseListener gridSquareMouseListener;
   Integer numGridSquares;
@@ -68,7 +69,7 @@ public class MainGameFrame extends JFrame{
   static Integer playerIndex = 0;
   static ArrayList<String> currentNames = new ArrayList<String>();
   
-  JTextArea armyOwner_ARMY;
+  JLabel armyOwner_ARMY;
   ImageIcon basicIcon_ARMY, attackerIcon_ARMY, explorerIcon_ARMY, rusherIcon_ARMY;
   JLabel numBasic_ARMY, numAttacker_ARMY, numExplorer_ARMY, numRusher_ARMY;
   JLabel strength_ARMY;
@@ -101,6 +102,7 @@ public class MainGameFrame extends JFrame{
   
   JLabel resourceState;
   JLabel resourceBonus;
+
   
   public MainGameFrame(String inTitle, Integer numRows, Integer numCols, Tile[][] tiles){
     super(inTitle);
@@ -208,9 +210,7 @@ public class MainGameFrame extends JFrame{
     attackerIcon_ARMY = new ImageIcon("src/Resources/attackerIcon.png");
     explorerIcon_ARMY = new ImageIcon("src/Resources/explorerIcon.png");
     rusherIcon_ARMY = new ImageIcon("src/Resources/rusherIcon.png");
-    armyOwner_ARMY = new JTextArea("Jordan's army");
-    armyOwner_ARMY.setEditable(false);
-    armyOwner_ARMY.setOpaque(false);
+    armyOwner_ARMY = new JLabel("Jordan's army", JLabel.CENTER);
     
     armyOwner_ARMY.setFont(HUD_HEADER_FONT);
     strength_ARMY = new JLabel("Army strength: ???", JLabel.CENTER);
@@ -299,9 +299,12 @@ public class MainGameFrame extends JFrame{
     myCityArmyPanel.add(new JLabel(rusherIconMyCity));
     myCityArmyPanel.add(numRusherMyCity);
     
+    TrainingTextMouseListener trainingTextMouseListener = new TrainingTextMouseListener();
+    
     trainNumberOfUnits = new JTextField();
     trainNumberOfUnits.setPreferredSize(new Dimension(30, 20));
     trainNumberOfUnits.setText("0");
+    trainNumberOfUnits.addMouseListener(trainingTextMouseListener);
     trainingButton = new JButton();
     trainingButton.setText("$0");
     
@@ -336,13 +339,14 @@ public class MainGameFrame extends JFrame{
     rusherRadioBut_CITY.addActionListener(unitButtonListener);
     trainingButtons_CITY = new ButtonGroup();
     trainingButtons_CITY.add(basicRadioBut_CITY);
-    trainingButtons_CITY.add(attackerRadioBut_CITY);
     trainingButtons_CITY.add(explorerRadioBut_CITY);
+    trainingButtons_CITY.add(attackerRadioBut_CITY);
     trainingButtons_CITY.add(rusherRadioBut_CITY);
+    trainingButton.addActionListener(unitButtonListener);
     
     myCityTrainingBottomPanel.add(basicRadioBut_CITY);
-    myCityTrainingBottomPanel.add(attackerRadioBut_CITY);
     myCityTrainingBottomPanel.add(explorerRadioBut_CITY);
+    myCityTrainingBottomPanel.add(attackerRadioBut_CITY);
     myCityTrainingBottomPanel.add(rusherRadioBut_CITY);
     
     
@@ -401,7 +405,7 @@ public class MainGameFrame extends JFrame{
     HUDCitySelectMainPanel.add(unoccupiedCityPanel, "unoccupied");
     HUDCitySelectMainPanel.add(myCityPanel, "my");
     HUDCitySelectMainPanel.add(enemyCityPanel, "enemy");
-    cityMainLayout.show(HUDCitySelectMainPanel, "my");
+    cityMainLayout.show(HUDCitySelectMainPanel, "enemy");
     
     HUDCitySelectPanel = new JPanel(new BorderLayout());
     HUDCitySelectPanel.add(cityStatus_CITY, BorderLayout.NORTH);
@@ -428,7 +432,7 @@ public class MainGameFrame extends JFrame{
     HUDTopPanel.add(HUDArmySelectPanel, "Army");
     HUDTopPanel.add(HUDCitySelectPanel, "City");
     HUDTopPanel.add(HUDResSelectPanel, "Resource");
-    HUDLayout.show(HUDTopPanel, "City");
+    HUDLayout.show(HUDTopPanel, "Resource");
     
     HUDPanel.add(HUDTopPanel, BorderLayout.CENTER);
     HUDPanel.add(currentPositionPanel, BorderLayout.SOUTH);
@@ -446,14 +450,46 @@ public class MainGameFrame extends JFrame{
   public class UnitButtonListener implements ActionListener{
 
     public void actionPerformed(ActionEvent e) {
-      if (e.getSource() == basicRadioBut_CITY)
+      if (e.getSource() == basicRadioBut_CITY){
         System.out.println("Clicked on basic unit button");
-      if (e.getSource() == attackerRadioBut_CITY)
+        trainingButton.setText(getPriceOf(5));//price of basic * num
+      }
+      if (e.getSource() == attackerRadioBut_CITY){
         System.out.println("Clicked on attacker unit button");
-      if (e.getSource() == explorerRadioBut_CITY)
+        trainingButton.setText(getPriceOf(8));//price of attacker * num
+      }
+      if (e.getSource() == explorerRadioBut_CITY){
         System.out.println("Clicked on explorer unit button");
-      if (e.getSource() == rusherRadioBut_CITY)
+        trainingButton.setText(getPriceOf(8));//price of explorer * num
+      }
+      if (e.getSource() == rusherRadioBut_CITY){
         System.out.println("Clicked on rusher unit button");
+        trainingButton.setText(getPriceOf(10));//price of rusher * num
+      }
+      if (e.getSource() == trainingButton){
+        System.out.println("Spend " + trainingButton.getText() + " to get " + trainNumberOfUnits.getText());
+        if (basicRadioBut_CITY.isSelected()){
+          System.out.println("Basic unit(s).");
+        }
+        else if (attackerRadioBut_CITY.isSelected()){
+          System.out.println("Attacker unit(s).");
+        }
+        else if (explorerRadioBut_CITY.isSelected()){
+          System.out.println("Explorer unit(s)");
+        }
+        else if (rusherRadioBut_CITY.isSelected()){
+          System.out.println("Rusher unit(s)");
+        }
+        else
+          System.out.println("Nothing selected");
+        trainingButtons_CITY.clearSelection();
+      }
+    }
+  }
+  
+  public class TrainingTextMouseListener extends MouseAdapter{
+    public void mousePressed(MouseEvent e){
+      trainingButtons_CITY.clearSelection();
     }
   }
   
@@ -461,39 +497,60 @@ public class MainGameFrame extends JFrame{
     public void mouseClicked(MouseEvent e) {
       Integer rowNumber = null;
       Integer colNumber = null;
+      prevSelected = currentSelected;
       for (Integer i = 0; i < ROWS; i++)
         for (Integer j = 0; j < COLS; j++)
           if (e.getSource() == gridSquares[i][j]){
+            //set up the HUD
+            currentSelected = mapTiles[i][j];
+            if (prevSelected != null && (currentSelected != prevSelected) && prevSelected.getOccupant() != null){
+              //if last click is outlined
+              for (Coord x : prevSelected.getOccupant().possibleMoves)
+                //undo the outline
+                undoOutlineSquare(x);
+            }
             rowNumber = i;
             colNumber = j;
-            if (currentSelected == null || currentSelected.getOccupant() == null){
-              //last map click wasn't an army
-              currentSelected = mapTiles[i][j];
+            if (prevSelected == null || prevSelected.getOccupant() == null){//last click not an army
               if (currentSelected.getOccupant() != null){//occupied by army
+                printArmyPanel(currentSelected);
                 HUDLayout.show(HUDTopPanel, "Army");
-                //box outline around
+                for(Coord x : currentSelected.getOccupant().possibleMoves){
+                  outlineSquare(x);
+                }
               }
               else if (currentSelected.isCity()){//is a city
                 HUDLayout.show(HUDTopPanel, "City");
-                //if (currentSelected.getOccupant() == null)
-                //  cityMainLayout.show(cityMainPanel, "unoccupied");
-                //else if (currentSelected.getOccupant() == currentPlayer)
-                //  cityMainLayout.show(cityMainPanel, "my");
-                //else
-                //  cityMainLayout.show(cityMainPanel, "enemy");
+                if (currentSelected.getOccupant() == null){
+                  printUnoccupiedCityPanel(currentSelected);
+                  cityMainLayout.show(HUDCitySelectMainPanel, "unoccupied");
+                }
+                else if (currentSelected.getOccupant().owner == Siege.currentPlayer){
+                  printMyCityPanel(currentSelected);
+                  cityMainLayout.show(HUDCitySelectMainPanel, "my");
+                  for(Coord x : currentSelected.getOccupant().possibleMoves){
+                    outlineSquare(x);
+                  }
+                }
+                else{
+                  printEnemyCityPanel(currentSelected);
+                  cityMainLayout.show(HUDCitySelectMainPanel, "enemy");
+                }
               }
-              else if (currentSelected.isResource())//is a resource
+              else if (currentSelected.isResource()){//is a resource
+                printResourcePanel(currentSelected);
                 HUDLayout.show(HUDTopPanel, "Resource");
-              else
+              }
+              else{
+                printNonePanel();
                 HUDLayout.show(HUDTopPanel, "None");
+              }
             }
             else{
-              //last map click was an army
-              Tile prevSelected = currentSelected;
+              //last map click was an army/my city
+              //perform attack or move
               currentSelected = mapTiles[i][j];
-              if (prevSelected.coord.row == currentSelected.coord.row
-                  &&prevSelected.coord.col == currentSelected.coord.col){//clicked again
-                System.out.println("Tile deselected");
+              if (prevSelected == currentSelected){//clicked again
                 currentSelected = null;
               }
               else if (currentSelected.getOccupant() != null)//occupied by army
@@ -505,12 +562,27 @@ public class MainGameFrame extends JFrame{
             }
           }
       if(SwingUtilities.isLeftMouseButton(e)){
+        outlineSquare(currentSelected.coord);
+        if (prevSelected != null)
+          undoOutlineSquare(prevSelected.coord);
+        if (currentSelected == prevSelected){
+          System.out.println("Clicked on same space");
+          currentSelected = null;
+        }
         System.out.println("left clicked on square at: (Row: " + rowNumber + " Col: " + colNumber + ")");
-        outlineSquare(rowNumber, colNumber);
+        if (currentSelected != null)
+          System.out.println("currentSelected: (" + currentSelected.coord.row + ", " + currentSelected.coord.col + ")");
+        else
+          System.out.println("currentSelected: null");
+        if (prevSelected != null)
+          System.out.println("prevSelected: (" + prevSelected.coord.row + ", " + prevSelected.coord.col + ")");
+        else
+          System.out.println("prevSelected: null");
+        //outlineSquare(rowNumber, colNumber);
       }
       if(SwingUtilities.isRightMouseButton(e)){
         System.out.println("right clicked on square at: (Row: " + rowNumber + " Col: " + colNumber + ")");
-        undoOutlineSquare(rowNumber, colNumber);
+        //undoOutlineSquare(rowNumber, colNumber);
       }
     }
   
@@ -658,6 +730,121 @@ public class MainGameFrame extends JFrame{
   
   void undoOutlineSquare(Integer row, Integer col){
     gridSquares[row][col].setBorder(null);
+  }
+  
+  String getPriceOf(int cost){
+    String amt = trainNumberOfUnits.getText();
+    int num = 0;
+    Integer toReturn;
+    try{
+      num = Integer.parseInt(amt);
+      toReturn = cost * num;
+    }
+    catch(NumberFormatException e){
+      num = 0;
+      toReturn = 0;
+      trainNumberOfUnits.setText("0");
+    }
+    if (num > 20){
+      num = 20;
+      toReturn = cost * num;
+      trainNumberOfUnits.setText("20");
+    }
+    if (num < 0){
+      num = 0;
+      toReturn = 0;
+      trainNumberOfUnits.setText("0");
+    }
+    return "$" + toReturn.toString();
+  }
+  
+  void printNonePanel(){
+    //currentGold.setText("Current Gold: $" + Siege.players[Siege.currentPlayer].getGold());
+    //currentIncome.setText("Current Income: $" + Siege.players[Siege.currentPlayer].getIncome());
+  }
+  void printUnoccupiedCityPanel(Tile noneTile){
+    //cityStatus_CITY.setText("City is unoccupied");
+  }
+  
+  void printMyCityPanel(Tile cityTile){
+    /*
+    String owner = Siege.players[cityTile.owner].name;
+    cityStatus_CITY.setText("City is occupied by " + owner);
+    strengthLabelMyCity.setText("Occuyping army strength: " + cityTile.getOccupant().getStrength());
+    numberOfUnitsLabelMyCity.setText("Number of units: " + cityTile.getOccupant().units.size());
+    Integer b = 0, e = 0, a = 0, r = 0;
+    for (Unit x : cityTile.getOccupant().units){
+      if (x.name == "Basic")
+        b++;
+      if (x.name == "Explorer")
+        e++;
+      if (x.name == "Attacker")
+        a++;
+      if (x.name == "Rusher")
+        r++;
+    }
+    numBasicMyCity.setText(b.toString());
+    numExplorerMyCity.setText(e.toString());
+    numAttackerMyCity.setText(a.toString());
+    numRusherMyCity.setText(r.toString());
+    */
+  }
+  
+  void printEnemyCityPanel(Tile cityTile){
+    /*
+    String owner = Siege.players[cityTile.owner].name;
+    cityStatus_CITY.setText("City is occupied by " + owner);
+    strengthLabelMyCity.setText("Occuyping army strength: " + cityTile.getOccupant().getStrength());
+    numberOfUnitsLabelMyCity.setText("Number of units: " + cityTile.getOccupant().units.size());
+    Integer b = 0, e = 0, a = 0, r = 0;
+    for (Unit x : cityTile.getOccupant().units){
+      if (x.name == "Basic")
+        b++;
+      if (x.name == "Explorer")
+        e++;
+      if (x.name == "Attacker")
+        a++;
+      if (x.name == "Rusher")
+        r++;
+    }
+    numBasicEnemyCity.setText(b.toString());
+    numExplorerEnemyCity.setText(e.toString());
+    numAttackerEnemyCity.setText(a.toString());
+    numRusherEnemyCity.setText(r.toString());
+     */
+  }
+  
+  void printArmyPanel(Tile armyTile){
+    /*
+    armyOwner_ARMY.setText(Siege.players[armyTile.owner].name + "'s Army");
+    strength_ARMY.setText("Army strength: " + armyTile.getOccupant().getStrength());
+    numberOfUnits_ARMY.setText("Number of units: " + armyTile.getOccupant().units.size());
+    Integer b = 0, e = 0, a = 0, r = 0;
+    for (Unit x : armyTile.getOccupant().units){
+      if (x.name == "Basic")
+        b++;
+      if (x.name == "Explorer")
+        e++;
+      if (x.name == "Attacker")
+        a++;
+      if (x.name == "Rusher")
+        r++;
+    }
+    numBasic_ARMY.setText(b.toString());
+    numAttacker_ARMY.setText(e.toString());
+    numExplorer_ARMY.setText(a.toString());
+    numRusher_ARMY.setText(r.toString());
+    */
+  }
+  
+  void printResourcePanel(Tile resourceTile){
+    /*
+    if (resourceTile.owner == -1)
+      resourceState.setText("Resource is under conflict");
+    else
+      resourceState.setText("Resource is owned by " + Siege.players[resourceTile.owner].name);
+    resourceBonus.setText("Resource adds " + resourceTile.income + "income");
+    */
   }
 }
 

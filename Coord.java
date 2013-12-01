@@ -9,4 +9,8 @@ public class Coord {
 		row = row_in;
 		col = col_in;
 	}
+	
+	public String toString(){
+	  return "(" + row + ", " + col + ")";
+	}
 }
