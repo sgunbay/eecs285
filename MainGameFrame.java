@@ -1077,13 +1077,13 @@ public class MainGameFrame extends JFrame {
         + cityTile.getOccupant().units.size());
     Integer b = 0, e = 0, a = 0, r = 0;
     for (Unit x : cityTile.getOccupant().units) {
-      if (x.name == "Basic")
+      if (x.name.equalsIgnoreCase("Basic"))
         b++;
-      if (x.name == "Explorer")
+      if (x.name.equalsIgnoreCase("Explorer"))
         e++;
-      if (x.name == "Attacker")
+      if (x.name.equalsIgnoreCase("Attacker"))
         a++;
-      if (x.name == "Rusher")
+      if (x.name.equalsIgnoreCase("Rusher"))
         r++;
     }
     numBasicMyCity.setText(b.toString());
