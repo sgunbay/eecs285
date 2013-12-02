@@ -52,12 +52,11 @@ public class MainGameFrame extends JFrame {
   JLabel currentGold, currentIncome;
 
   JPanel statsPanel;
-  
+
   JPanel currentPositionPanel;
   JLabel currentPositionLabel;
   JPanel[][] gridSquares;
-  Tile currentSelected;
-  Tile prevSelected;
+  Tile currentSelected = null;
 
   GridSquareMouseListener gridSquareMouseListener;
   Integer numGridSquares;
@@ -490,12 +489,12 @@ public class MainGameFrame extends JFrame {
     statsPanel = new JPanel(new GridLayout(3, 1));
     statsPanel.add(currentGold);
     statsPanel.add(currentIncome);
-    
+
     JPanel endTurnButtonPanel = new JPanel();
     endTurnButton.setEnabled(false);
     endTurnButtonPanel.add(endTurnButton);
     statsPanel.add(endTurnButtonPanel);
-    
+
     auxPanel.add(narrationPanel, BorderLayout.CENTER);
     auxPanel.add(statsPanel, BorderLayout.NORTH);
     auxPanel.add(HUDPanel, BorderLayout.SOUTH);
@@ -541,8 +540,6 @@ public class MainGameFrame extends JFrame {
 
     public void actionPerformed(ActionEvent e) {
       Tile relevant = currentSelected;
-      if (relevant == null)
-        relevant = prevSelected;
       if (e.getSource() == basicRadioBut_CITY) {
         System.out.println("Clicked on basic unit button");
         trainingButton.setText(getPriceOf(BASIC_COST));// price of basic * num
@@ -606,156 +603,96 @@ public class MainGameFrame extends JFrame {
 
   public class GridSquareMouseListener extends MouseAdapter {
     public void mouseClicked(MouseEvent e) {
-      if (currentHUDCard != "Lock") {
-        Integer rowNumber = null;
-        Integer colNumber = null;
-        prevSelected = currentSelected;
-        for (Integer i = 0; i < ROWS; i++)
-          for (Integer j = 0; j < COLS; j++)
-            if (e.getSource() == gridSquares[i][j]) {
-              if (Siege.grid.getTile(new Coord(i, j)).owner != -1 && Siege.players[Siege.grid.getTile(new Coord(i, j)).owner].name.equals(name))
+      if (currentSelected != null) {
+        for (Coord x : currentSelected.getOccupant().possibleMoves) {
+          undoOutlineSquare(x);
+        }
+      }
+      for (Integer i = 0; i < ROWS; i++) {
+        for (Integer j = 0; j < COLS; j++) {
+          if (e.getSource().equals(gridSquares[i][j])) {
+            if (currentSelected == null) {
+              if (Siege.grid.getTile(new Coord(i, j)).isCity()
+                  && Siege.grid.getTile(new Coord(i, j)).owner != -1
+                  && Siege.players[Siege.grid.getTile(new Coord(i, j)).owner].name
+                      .equals(name)) {
                 currentSelected = Siege.grid.getTile(new Coord(i, j));
-              if (prevSelected != null && (currentSelected != prevSelected)
-                  && prevSelected.getOccupant() != null) {
-                // if last click is outlined
-                for (Coord x : prevSelected.getOccupant().possibleMoves)
-                  undoOutlineSquare(x);
-              }
-              rowNumber = i;
-              colNumber = j;
-              if ((prevSelected == null || prevSelected.getOccupant() == null) && currentSelected != null) {
-                // last click not an army
-                if (currentSelected.getOccupant() != null
-                    && !currentSelected.isCity()) {// occupied by army
-                  System.out.println(currentSelected);
-                  printArmyPanel(currentSelected);
-                  HUDLayout.show(HUDTopPanel, "Army");
-                  currentHUDCard = "Army";
-                  for (Coord x : currentSelected.getOccupant().possibleMoves) {
-                    outlineSquare(x);
-                  }
-                } else if (currentSelected.isCity()) {// is a city
-                  HUDLayout.show(HUDTopPanel, "City");
-                  if (currentSelected.owner == -1) {
-                    printUnoccupiedCityPanel(currentSelected);
-                    cityMainLayout.show(HUDCitySelectMainPanel, "unoccupied");
-                    currentHUDCard = "City";
-                  } else if (currentSelected.owner == Siege.currentPlayer) {
-                    printMyCityPanel(currentSelected);
-                    cityMainLayout.show(HUDCitySelectMainPanel, "my");
-                    currentHUDCard = "City";
-                    for (Coord x : currentSelected.getOccupant().possibleMoves) {
-                      outlineSquare(x);
-                    }
-                  } else {
-                    printEnemyCityPanel(currentSelected);
-                    cityMainLayout.show(HUDCitySelectMainPanel, "enemy");
-                    currentHUDCard = "City";
-                  }
-                } else if (currentSelected.isResource()) {// is a resource
-                  printResourcePanel(currentSelected);
-                  HUDLayout.show(HUDTopPanel, "Resource");
-                  currentHUDCard = "Resource";
-                } else {
-                  printNonePanel();
-                  HUDLayout.show(HUDTopPanel, "None");
-                  currentHUDCard = "None";
+                System.out.println("Getting this far.");
+                for (Coord x : currentSelected.getOccupant().possibleMoves) {
+                  outlineSquare(x);
                 }
+                printMyCityPanel(currentSelected);
+                HUDLayout.show(HUDTopPanel, "City");
+                currentHUDCard = "City";
+                cityMainLayout.show(HUDCitySelectMainPanel, "my");
+              } else if (Siege.grid.getTile(new Coord(i, j)).getOccupant() != null
+                  && Siege.grid.getTile(new Coord(i, j)).owner != -1
+                  && Siege.players[Siege.grid.getTile(new Coord(i, j)).owner].name
+                      .equals(name)) {
+                currentSelected = Siege.grid.getTile(new Coord(i, j));
+                for (Coord x : currentSelected.getOccupant().possibleMoves) {
+                  outlineSquare(x);
+                }
+                printArmyPanel(currentSelected);
+                HUDLayout.show(HUDTopPanel, "Army");
+                currentHUDCard = "City";
               } else {
-                // last map click was an army/my city
-                // perform attack or move
-                // currentSelected = mapTiles.getTile(new Coord(i, j));
-                if (prevSelected == currentSelected) {// clicked again
-                  currentSelected = null;
-                } else if (currentSelected.getOccupant() != null) {// occupied
-                  // by army
-                  if (currentSelected.getOccupant().getColor() == prevSelected
-                      .getOccupant().getColor()) {
-                    System.out
-                        .println(name + " merged army at " + prevSelected.coord
-                            + " with " + currentSelected.coord);
-                    try {
-                      Siege.sendToServer(name + " merged army at "
-                          + prevSelected.coord + " with "
-                          + currentSelected.coord);
-                    } catch (Exception ex) {
-                      System.exit(-1);
+                currentSelected = Siege.grid.getTile(new Coord(i, j));
+                printNonePanel();
+                HUDLayout.show(HUDTopPanel, "None");
+                currentHUDCard = "None";
+              }
+            } else {
+              System.out.println(currentSelected);
+              if (currentSelected.getOccupant() != null) {
+                System.out.println(currentSelected.getOccupant());
+                for (Coord x : currentSelected.getOccupant().possibleMoves) {
+                  if (new Coord(i, j).equals(x)) {
+                    if (Siege.grid.getTile(x).getOccupant() == null) {
+                      try {
+                        Siege.sendToServer(name + "moved army from "
+                            + currentSelected.coord + " to " + x);
+                      } catch (Exception ex) {
+                        System.exit(-1);
+                      }
                     }
-                  } else {
-                    System.out
-                        .println(name
-                            + "'s army at "
-                            + prevSelected.coord
-                            + "attacks "
-                            + Siege.players[currentSelected.getOccupant().owner].name
-                            + "army at " + currentSelected.coord);
-                    try {
-                      Siege
-                          .sendToServer(name
-                              + "'s army at "
-                              + prevSelected.coord
-                              + " attacks "
-                              + Siege.players[currentSelected.getOccupant().owner].name
-                              + "'s army at " + currentSelected.coord);
-                    } catch (Exception ex) {
-                      System.exit(-1);
+                    if (Siege.players[Siege.grid.getTile(x).getOccupant().owner].name
+                        .equals(name)) {
+                      try {
+                        Siege.sendToServer(name + " merged army at "
+                            + currentSelected.coord + " with " + x);
+                      } catch (Exception ex) {
+                        System.exit(-1);
+                      }
+                    } else {
+                      // try attack
+                      try {
+                        Siege
+                            .sendToServer(name
+                                + "'s army at "
+                                + currentSelected.coord
+                                + " attacks "
+                                + Siege.players[Siege.grid.getTile(x)
+                                    .getOccupant().owner].name + "'s army at "
+                                + x);
+                      } catch (Exception ex) {
+                        System.exit(-1);
+                      }
                     }
-                  }
-                } else if (currentSelected.isCity()) {// is a city
-                  System.out.println(name + "'s army at " + prevSelected.coord
-                      + "attacks "
-                      + Siege.players[currentSelected.getOccupant().owner].name
-                      + "city at " + currentSelected.coord);
-                  try {
-                    Siege
-                        .sendToServer(name
-                            + "'s army at "
-                            + prevSelected.coord
-                            + " attacks "
-                            + Siege.players[currentSelected.getOccupant().owner].name
-                            + "'s city at " + currentSelected.coord);
-                  } catch (Exception ex) {
-                    System.exit(-1);
-                  }
-                } else {
-                  System.out.println(name + " moved army from "
-                      + prevSelected.coord + " to " + currentSelected.coord);
-                  try {
-                    Siege.sendToServer(name + " moved army from "
-                        + prevSelected.coord + " to " + currentSelected.coord);
-                  } catch (Exception ex) {
-                    System.exit(-1);
                   }
                 }
               }
             }
-        if (SwingUtilities.isLeftMouseButton(e)) {
-          if (currentSelected != null)
-            outlineSquare(currentSelected.coord);
-          if (prevSelected != null)
-            undoOutlineSquare(prevSelected.coord);
-          if (currentSelected != null && prevSelected != null && currentSelected == prevSelected && !currentSelected.isCity()) {
-            System.out.println("Clicked on same space");
-            currentSelected = null;
           }
-          System.out.println("left clicked on square at: (Row: " + rowNumber
-              + " Col: " + colNumber + ")");
-          if (currentSelected != null)
-            System.out.println("currentSelected: " + currentSelected.coord);
-          else
-            System.out.println("currentSelected: null");
-          if (prevSelected != null)
-            System.out.println("prevSelected: " + prevSelected.coord);
-          else
-            System.out.println("prevSelected: null");
-          // outlineSquare(rowNumber, colNumber);
-        }
-        if (SwingUtilities.isRightMouseButton(e)) {
-          System.out.println("right clicked on square at: (Row: " + rowNumber
-              + " Col: " + colNumber + ")");
-          // undoOutlineSquare(rowNumber, colNumber);
         }
       }
+      if (SwingUtilities.isLeftMouseButton(e)) {
+        if (currentSelected != null){
+          for (Coord x : currentSelected.getOccupant().possibleMoves)
+            outlineSquare(x);
+        }
+      }
+      System.out.println("Current selected: " + currentSelected.coord);
     }
 
     // simulate mouse entering board to update all tiles
@@ -787,7 +724,8 @@ public class MainGameFrame extends JFrame {
                 .brighter());
             currentPositionLabel.setText("(Row: " + i + " Col: " + j + ")");
 
-            if (currentTile != null && currentTile.getOccupant() != null
+            if (currentTile != null
+                && currentTile.getOccupant() != null
                 && currentTile.getOccupant().owner != -1
                 && Siege.players[currentTile.getOccupant().owner].name
                     .equals(name)) {
@@ -816,14 +754,24 @@ public class MainGameFrame extends JFrame {
         for (Integer j = 0; j < COLS; j++) {
           if (e.getSource() == gridSquares[i][j]) {
             Tile currentTile = Siege.grid.getTile(new Coord(i, j));
-            if (currentTile != null && currentTile.getOccupant() != null
+            if (currentTile != null
+                && currentTile.getOccupant() != null
                 && currentTile.getOccupant().owner != -1
                 && Siege.players[currentTile.getOccupant().owner].name
                     .equals(name)) {
               for (Coord x : currentTile.getOccupant().possibleInfluences) {
-                gridSquares[x.row][x.col]
-                    .setBackground(stringToColor(Siege.grid.getTile(x)
-                        .getColor()));
+                if (!Siege.grid.getTile(x).isResource()) {
+                  gridSquares[x.row][x.col]
+                      .setBackground(stringToColor(Siege.grid.getTile(x)
+                          .getColor()));
+                } else {
+                  gridSquares[x.row][x.col]
+                      .setBackground(stringToColor(guessResourceBackground(Siege.grid
+                          .getTile(x))));
+                }
+              }
+              for (Coord x : currentTile.getOccupant().possibleMoves){
+                undoOutlineSquare(x);
               }
             } else {
               gridSquares[i][j].setBackground(stringToColor(Siege.grid.getTile(
@@ -843,7 +791,7 @@ public class MainGameFrame extends JFrame {
   }
 
   void updateGridSquare(Coord pos) throws Exception {
-    if (gridSquares[pos.row][pos.col].getComponentCount() != 0){
+    if (gridSquares[pos.row][pos.col].getComponentCount() != 0) {
       gridSquares[pos.row][pos.col].removeAll();
       gridSquares[pos.row][pos.col].repaint();
     }
@@ -946,9 +894,9 @@ public class MainGameFrame extends JFrame {
     if (in.equals("plains"))
       return Color.GREEN.darker();
     else if (in.equals("forest"))
-      return Color.green.darker().darker();
+      return Color.green.darker().darker().darker();
     else if (in.equals("muddy"))
-      return new Color(90, 90, 0);
+      return Color.yellow.darker();
     else if (in.equals("mountain"))
       return new Color(90, 50, 0);
     else if (in.equals("water"))
