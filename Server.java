@@ -84,7 +84,7 @@ public class Server {
 
         while (!checkReady()) 
             try {
-                Thread.sleep(1);
+            	Thread.sleep(1);
             } catch (InterruptedException e) {
             }
         

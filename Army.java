@@ -204,6 +204,7 @@ public class Army{
 		// Update yourself.
 		coord = target;
 		possibleMoves = new Vector<Coord>();
+		updatePossibleInfluences();
 		return true;
 	}
 

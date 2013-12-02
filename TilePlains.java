@@ -12,6 +12,5 @@ public class TilePlains extends Tile {
 	
 	public Double getInfFactor(){
 		return 1.0;
-	}
-
+	}	
 }

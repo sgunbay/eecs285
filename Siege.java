@@ -53,6 +53,7 @@ public class Siege {
         final int cols = grid.cols;
        
         mainFrame = new MainGameFrame(grid);
+
         
         //get player names array from server
         playerNames = (String[]) in.readObject();
@@ -61,10 +62,11 @@ public class Siege {
         numPlayers = playerNames.length;
         players = new Player[numPlayers];
         for(int i = 0; i < playerNames.length; i++)
-            players[i] = new Player(i,playerNames[i]); 
+            players[i] = new Player(i,playerNames[i]);       
         
         while (true) {
             // Get string from server
+            // String fromServer = in.readLine();
             String fromServer = (String) in.readObject();
             fromServer = Siege.parseServerString(fromServer);
             System.out.println("FROM SERVER: " + fromServer);
@@ -86,50 +88,11 @@ public class Siege {
             // perform action depending on what server string specifies
             switch (atype) {
             case ATTACK_ARMY:
-                System.out.println("Attack Army");
-                attacker = parser.getFirstCoordinate();
-                target = parser.getSecondCoordinate();
-                parser.getFirstPlayer();
-                break;
             case ATTACK_CITY:
-                System.out.println("Attack City");
-                attacker = parser.getFirstCoordinate();
-                city = parser.getSecondCoordinate();
-                break;
             case CAPTURE_CITY:
-                System.out.println("Capture City");
-                city = parser.getFirstCoordinate();
-
-                break;
-            case CAPTURE_RESOURCE:
-                System.out.println("Capture Resource");
-                resource = parser.getFirstCoordinate();
-
-                break;
-            case CITY_LIBERATED:
-                System.out.println("Liberate City");
-                city = parser.getFirstCoordinate();
-
-                break;
-            case CITY_UNDER_SIEGE:
-                System.out.println("Siege City");
-                city = parser.getFirstCoordinate();
-
-                break;
-            case END_TURN:
-                mainFrame.printNarration(players[currentPlayer].name + " ends turn.");
-                players[currentPlayer].endTurn();
-                mainFrame.updateAllGridSquares();
-                mainFrame.updatePlayer();
-                break;
-            case LOSE_UNITS:
-                System.out.println("Lose Units");
-                break;
             case MERGE_ARMY:
-                System.out.println("Merge Army");
-                break;
             case MOVE_ARMY:
-                Coord me = parser.getFirstCoordinate();
+            	Coord me = parser.getFirstCoordinate();
                 Coord victim = parser.getSecondCoordinate();
             	if (grid.getOccupantAt(me).attemptMove(victim))
             		mainFrame.printNarration(fromServer);
@@ -137,7 +100,32 @@ public class Siege {
             		System.out.println("Invalid move attempted.");
             	mainFrame.updateGridSquare(me);
             	mainFrame.updateGridSquare(victim);
-            	
+            	mainFrame.gridSquareMouseListener.simulateMouseEntered();
+                break;
+            case CAPTURE_RESOURCE:
+            	//
+                System.out.println("Capture Resource");
+                resource = parser.getFirstCoordinate();
+                break;
+            case CITY_LIBERATED:
+                //
+            	System.out.println("Liberate City");
+                city = parser.getFirstCoordinate();
+                break;
+            case CITY_UNDER_SIEGE:
+            	//
+                System.out.println("Siege City");
+                city = parser.getFirstCoordinate();
+                break;
+            case END_TURN:
+                mainFrame.printNarration(players[currentPlayer].name + " ends turn.");
+                players[currentPlayer].endTurn();
+                mainFrame.updateAllGridSquares();
+                mainFrame.updatePlayer();
+                mainFrame.printNonePanel();
+                break;
+            case LOSE_UNITS:
+                System.out.println("Lose Units");
                 break;
             case RECRUIT:
             	city = parser.getFirstCoordinate();
@@ -150,19 +138,17 @@ public class Siege {
             		count += attemptTrain(t,unitType);
             	
             	grid.setTile(city,t);
-            	mainFrame.updateGridSquare(city);            	
-            	mainFrame.gridSquareMouseListener.simulateMouseEntered();      	
+            	mainFrame.updateGridSquare(city);
+            	mainFrame.gridSquareMouseListener.simulateMouseEntered();
             	mainFrame.printNarration(playerNames[currentPlayer] + " trains " + count + " " + unitType + " unit(s) at city " + city);
                 break;
             case RESOURCE_RECAPTURED:
                 System.out.println("Recapture Resource");
                 resource = parser.getFirstCoordinate();
-
                 break;
             case RESOURCE_UNDER_CONFLICT:
                 System.out.println("Resource Contested");
                 resource = parser.getFirstCoordinate();
-
                 break;
             case PLAYER_DEFEATED:
                 System.out.println("Player Defeated");
