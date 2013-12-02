@@ -168,9 +168,11 @@ public class MainGameFrame extends JFrame {
         gridSquares[i][j] = adding;
         gridSquares[i][j].setLayout(overlay);
         gridSquares[i][j].setBackground(stringToColor(Siege.grid.getTile(
-              new Coord(i, j)).getColor()));
+            new Coord(i, j)).getColor()));
         if (Siege.grid.getTile(new Coord(i, j)).isResource())
-          gridSquares[i][j].setBackground(stringToColor(guessResourceBackground(Siege.grid.getTile(new Coord(i, j)))));
+          gridSquares[i][j]
+              .setBackground(stringToColor(guessResourceBackground(Siege.grid
+                  .getTile(new Coord(i, j)))));
         gridSquares[i][j].addMouseListener(gridSquareMouseListener);
         gridSquares[i][j]
             .setPreferredSize(new Dimension(SQUARESIZE, SQUARESIZE));
@@ -605,39 +607,40 @@ public class MainGameFrame extends JFrame {
           undoOutlineSquare(x);
         }
       }
+      int id = 0;
+      for (Player play : Siege.players) {
+        if (play.name.equalsIgnoreCase(name))
+          id = play.id;
+      }
       for (Integer i = 0; i < ROWS; i++) {
         for (Integer j = 0; j < COLS; j++) {
           if (e.getSource().equals(gridSquares[i][j])) {
             if (currentSelected == null) {
               if (Siege.grid.getTile(new Coord(i, j)).isCity()
-                  && Siege.grid.getTile(new Coord(i, j)).owner != -1
-                  && Siege.players[Siege.grid.getTile(new Coord(i, j)).owner].name
-                      .equals(name)) {
+                  && Siege.grid.getTile(new Coord(i, j)).owner == id) {
                 currentSelected = Siege.grid.getTile(new Coord(i, j));
                 printMyCityPanel(currentSelected);
                 HUDLayout.show(HUDTopPanel, "City");
                 currentHUDCard = "City";
                 cityMainLayout.show(HUDCitySelectMainPanel, "my");
 
-              } else if (Siege.grid.getTile(new Coord(i, j)).getOccupant() != null){
-                  //&& Siege.grid.getTile(new Coord(i, j)).owner != -1){
-                  //&& Siege.players[Siege.grid.getTile(new Coord(i, j)).owner].name
-                    //  .equals(name)) {
+              } else if (Siege.grid.getTile(new Coord(i, j)).getOccupant() != null
+                  && Siege.grid.getTile(new Coord(i, j)).owner == id) {
                 currentSelected = Siege.grid.getTile(new Coord(i, j));
                 printArmyPanel(currentSelected);
                 HUDLayout.show(HUDTopPanel, "Army");
                 currentHUDCard = "City";
 
-              } else{  
+              } else {
                 printNonePanel();
                 HUDLayout.show(HUDTopPanel, "None");
                 currentHUDCard = "None";
               }
-            }
-            else {
+            } else {
               System.out.println(currentSelected);
-              if (currentSelected.getOccupant() != null) {
-                
+              if (currentSelected.getOccupant() != null
+                  && id == Siege.currentPlayer) {
+
                 System.out.println(currentSelected.getOccupant());
                 for (Coord x : currentSelected.getOccupant().possibleMoves) {
                   if (i == x.row && j == x.col) {
@@ -685,7 +688,7 @@ public class MainGameFrame extends JFrame {
           }
         }
       }
-      if (SwingUtilities.isLeftMouseButton(e)) {
+      if (SwingUtilities.isLeftMouseButton(e) && id == Siege.currentPlayer) {
         if (currentSelected != null && currentSelected.getOccupant() != null) {
           for (Coord x : currentSelected.getOccupant().possibleMoves)
             outlineSquare(x);
@@ -852,9 +855,11 @@ public class MainGameFrame extends JFrame {
     if (in.isCity() || in.isResource())
       color = guessResourceBackground(in);
     else if (color.equals("plains"))
-      gridSquares[in.coord.row][in.coord.col].setBackground(stringToColor("plains"));
+      gridSquares[in.coord.row][in.coord.col]
+          .setBackground(stringToColor("plains"));
     else if (color.equals("forest"))
-      gridSquares[in.coord.row][in.coord.col].setBackground(stringToColor("forest"));
+      gridSquares[in.coord.row][in.coord.col]
+          .setBackground(stringToColor("forest"));
     else if (color.equals("muddy"))
       gridSquares[in.coord.row][in.coord.col]
           .setBackground(stringToColor("muddy"));
@@ -1006,14 +1011,12 @@ public class MainGameFrame extends JFrame {
 
   void printNonePanel() {
     int i = 0;
-    for (Player play : Siege.players){
+    for (Player play : Siege.players) {
       if (play.name.equalsIgnoreCase(name))
         i = play.id;
     }
-    currentGold.setText("Current Gold: $"
-        + Siege.players[i].getGold());
-    currentIncome.setText("Current Income: $"
-        + Siege.players[i].getIncome());
+    currentGold.setText("Current Gold: $" + Siege.players[i].getGold());
+    currentIncome.setText("Current Income: $" + Siege.players[i].getIncome());
   }
 
   void printUnoccupiedCityPanel(Tile noneTile) {
