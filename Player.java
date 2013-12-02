@@ -77,7 +77,7 @@ public class Player {
 	
 	public void endTurn(){
 		Siege.players[Siege.currentPlayer].refreshPlayer();
-		Siege.currentPlayer = (Siege.currentPlayer + 1)%4;
+		Siege.currentPlayer = (Siege.currentPlayer + 1)%Siege.numPlayers;
 	}
 	
 }

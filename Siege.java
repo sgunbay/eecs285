@@ -9,10 +9,11 @@ import java.util.Random;
 import com.eecs285.siegegame.ActionParser.ActionType;
 
 public class Siege {
-//nigger
+
     // These are required for the classes to work properly:
     public static Grid grid;
     public static int numCities;
+    public static int numPlayers;
     public static int currentPlayer;
     public static Player[] players;
     public static String[] playerNames;
@@ -45,15 +46,12 @@ public class Siege {
         //get player names array from server
         playerNames = (String[]) in.readObject();
         playerNames = fixDuplicates(playerNames);
-        for(int i = 0; i < playerNames.length; i++) {
-            System.out.println("playerNames[" + i + "] = " + playerNames[i]);
-        }
         
-        //create player objects here
+        numPlayers = playerNames.length;
+        players = new Player[numPlayers];
+        for(int i = 0; i < playerNames.length; i++)
+            players[i] = new Player(i,playerNames[i]);       
         
-        
-        
-
         while (true) {
             // Get string from server
             // String fromServer = in.readLine();
