@@ -192,10 +192,10 @@ public class Siege {
                                     new Coord(i, j)));
                             System.out.println(grid.getTile(new Coord(i, j))
                                     .getColor());
+                            mainFrame.updateGridSquare(new Coord(i, j));
                         }
                     }
                 }
-                mainFrame.updateAllGridSquares();
                 mainFrame.printNonePanel();
                 mainFrame.updatePlayer();
 

@@ -498,7 +498,7 @@ public class MainGameFrame extends JFrame {
 
     add(auxPanel, BorderLayout.WEST);
 
-    //updateAllGridSquares();
+    updateAllGridSquares();
     pack();
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setVisible(true);
