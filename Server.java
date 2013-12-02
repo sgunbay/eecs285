@@ -84,7 +84,7 @@ public class Server {
             } catch (InterruptedException e) {
             }
         
-        System.out.println("All players ready.");
+        System.out.println("All players ready. Starting game!");
         allClients[0].broadcastToClients("All players ready. Starting the game now. Good luck, have fun!");
     }
 
