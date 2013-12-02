@@ -44,7 +44,8 @@ public class Siege {
         // initialize connection to server (including IO streams)
         initServerConnection();
 
-        File map = new File("src/Resources/test0.map");
+        //File map = new File("src/Resources/test0.map");
+        File map = new File("src/Resources/test1.map");
 
         grid = new Grid(1);
         grid.load(map);
