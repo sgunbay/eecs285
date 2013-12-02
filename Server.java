@@ -75,7 +75,7 @@ public class Server {
         System.out.println("Done.");
         
         
-        System.out.print("Waiting for all players to be ready");
+        System.out.println("Waiting for all players to be ready");
         allClients[0].broadcastToClients("Waiting for all players to be ready...");
 
         while (!checkReady()) 
