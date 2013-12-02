@@ -186,7 +186,8 @@ public class ActionParser {
  * Player moved army from coord (x1, y1) to (x2, y2) 
  * Player merged army at coord (x1, y1) with (x2, y2) 
  * Player's army at (x1, y1) attacks player's army/city at (x2, y2)
- * Player's army loses units Player captures resource/city at coord (x, y) 
+ * Player's army loses units 
+ * Player captures resource/city at coord (x, y) 
  * Player's city at coord (x, y) is under siege/liberated
  * Player's resource at coord (x, y) is under conflict/recaptured 
  * Player is defeated 

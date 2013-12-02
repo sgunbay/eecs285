@@ -9,8 +9,7 @@ public class Server {
 	static MiniServer[] allClients; // contains all connected clients
 
 	// arrays to contain playerNames and whether players have chosen names yet
-	static String[] playerNames = { "Player 0", "Player 1", "Player 2",
-			"Player 3" };
+	static String[] playerNames;
 	static boolean[] chosen; // if name chosen
 	static boolean[] ready; // players ready?
 	static boolean connectionAllowed = true; // if additional players can join
@@ -35,6 +34,11 @@ public class Server {
         ready = new boolean[MAX_PLAYERS];
         for(int i = 0; i < MAX_PLAYERS; i++)
             chosen[i] = ready[i] = false;
+        
+        playerNames = new String[MAX_PLAYERS];
+        for(int i = 0; i < MAX_PLAYERS; i++)
+            playerNames[i] = "Player " + i;
+        
         
 
         // allow connections until 2 - 4 players have connected to the server
