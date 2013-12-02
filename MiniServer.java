@@ -7,9 +7,13 @@ import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+// Actual servers that do the IO with the clients
+// Each runs in separate thread to allow 4 simultaneous connections
+// Written by Max
+
 public class MiniServer extends Thread {
     private Socket socket = null;
-    int clientNum;
+    int clientNum; //contains unique IA
     BufferedReader iStream;
     ObjectOutputStream oStream;
 
@@ -27,7 +31,6 @@ public class MiniServer extends Thread {
         try {
             DataInputStream is = new DataInputStream(socket.getInputStream());
             iStream = new BufferedReader(new InputStreamReader(is));
-            // oStream = new DataOutputStream(socket.getOutputStream());
             oStream = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             System.out.println("ERROR: getting InputStream or OutputStream");
@@ -80,7 +83,7 @@ public class MiniServer extends Thread {
             // sleep to prevent overheating of processor in case
             // clients disconnect (not important to game)
             try {
-                Thread.sleep(5);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
             }
         }
@@ -104,7 +107,6 @@ public class MiniServer extends Thread {
             if (Server.allClients[i] == null)
                 continue;
             try {
-                // Server.allClients[i].oStream.writeChars(data);
                 Server.allClients[i].oStream.writeObject(data);
             } catch (Exception e) {
                 System.err.println("ERROR: writing to server: " + i);

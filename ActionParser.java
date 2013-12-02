@@ -1,5 +1,8 @@
 package com.eecs285.siegegame;
 
+// Gets information from the input string (string received form server)
+// Written by Max
+
 public class ActionParser {
 
     private String input;
@@ -8,6 +11,7 @@ public class ActionParser {
         input = in;
     }
 
+    // Contains all possible action types
     public static enum ActionType {
         ATTACK_ARMY,
         ATTACK_CITY,
@@ -31,8 +35,8 @@ public class ActionParser {
 
     ActionType getActionType() {
         // returns the action type present in the input string
+        
         // Army ActionTypes
-
         if (input.contains("attacks") && input.contains("army"))
             return ActionType.ATTACK_ARMY;
         else if (input.contains("attacks") && input.contains("city"))
@@ -129,20 +133,6 @@ public class ActionParser {
         // This player's name is always at beginning of string
         String[] words = input.split(" ");
         return getPlayerIndex(words[0]);
-        
-        /*
-        String pName = words[0];
-
-        // if string contains "Player's" instead of "Player", remove the 's
-        int nameLength = words[0].length();
-        if (words[0].charAt(nameLength - 2) == '\'') // need to escape ' mark
-            words[0] = words[0].substring(0, nameLength - 2);
-
-        for (int i = 0; i < Server.MAX_PLAYERS; i++) {
-            if (Siege.players[i] != null && Siege.players[i].name == pName)
-                return i;
-        }
-        return -1;*/
     }
 
     int getSecondPlayer() {
@@ -168,28 +158,14 @@ public class ActionParser {
     }
     
     String getTypeUnits() {
+        // unit type is 4th word in input string
         String[] words = input.split(" ");
         return words[3];
     }
     
     int getNumUnits() {
+        // number of units is 3rd word in input string
         String[] words = input.split(" ");
         return Integer.valueOf(words[2]); 
     }
 }
-
-/*
- * Narration mode 
- * Start game 
- * Announce player, turn # 
- * Player trained unit in city coord (x, y) 
- * Player moved army from coord (x1, y1) to (x2, y2) 
- * Player merged army at coord (x1, y1) with (x2, y2) 
- * Player's army at (x1, y1) attacks player's army/city at (x2, y2)
- * Player's army loses units Player captures resource/city at coord (x, y) 
- * Player's city at coord (x, y) is under siege/liberated
- * Player's resource at coord (x, y) is under conflict/recaptured 
- * Player is defeated 
- * Player wins 
- * Player ends turn
- */
