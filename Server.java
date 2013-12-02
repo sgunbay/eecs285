@@ -5,7 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-
+//shit
 	static MiniServer[] allClients; // contains all connected clients
 
 	// arrays to contain playerNames and whether players have chosen names yet
