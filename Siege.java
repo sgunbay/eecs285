@@ -120,7 +120,12 @@ public class Siege {
             case END_TURN:
                 mainFrame.printNarration(players[currentPlayer].name + " ends turn.");
                 players[currentPlayer].endTurn();
-                mainFrame.updateAllGridSquares();
+                for (int i = 0; i < grid.rows; ++i){
+                	for (int j = 0; j < grid.rows; ++j){
+                		if (grid.getTile(new Coord(i,j)).isCity() || grid.getTile(new Coord(i,j)).isResource())
+                				mainFrame.updateGridSquare(new Coord(i,j));
+                	}
+                }
                 mainFrame.updatePlayer();
                 mainFrame.printNonePanel();
                 break;
@@ -222,7 +227,8 @@ public class Siege {
             if (Character.isLetterOrDigit(input.charAt(i))
                     || input.charAt(i) == ' ' || input.charAt(i) == '('
                     || input.charAt(i) == ')' || input.charAt(i) == ',' 
-                    || input.charAt(i) == '.' || input.charAt(i) == '!')
+                    || input.charAt(i) == '.' || input.charAt(i) == '!'
+                    || input.charAt(i) == '\'')
                 temp += input.charAt(i);
         }
         return temp;
