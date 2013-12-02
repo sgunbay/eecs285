@@ -932,19 +932,11 @@ public class MainGameFrame extends JFrame {
     else if (in.equalsIgnoreCase("player3color"))
       return "yellow";
     else
-      return "siege";
+      return "white";
   }
 
   String getPlayerName() {
     return name;
-  }
-
-  void printGold(Integer gold) {
-    currentGold.setText("Current Gold: " + gold);
-  }
-
-  void printIncome(Integer income) {
-    currentIncome.setText("Current Income: " + income);
   }
 
   void outlineAroundSquare(Integer row, Integer col, Integer radius) {
@@ -1134,11 +1126,11 @@ public class MainGameFrame extends JFrame {
   }
 
   void updatePlayer() {
-    if (Siege.players[Siege.currentPlayer].name != name) {
-      HUDLayout.show(HUDPanel, "Lock");
+    if (!Siege.players[Siege.currentPlayer].name.equalsIgnoreCase(name)) {
+      HUDLayout.show(HUDTopPanel, "Lock");
       currentHUDCard = "Lock";
     } else {
-      HUDLayout.show(HUDPanel, "None");
+      HUDLayout.show(HUDTopPanel, "None");
       currentHUDCard = "None";
     }
   }
