@@ -105,7 +105,9 @@ public class Siege {
                     System.out.println("Invalid move attempted.");
                 mainFrame.updateGridSquare(me);
                 mainFrame.updateGridSquare(victim);
-                mainFrame.gridSquareMouseListener.simulateMouseEntered();
+                try {
+                    mainFrame.gridSquareMouseListener.simulateMouseEntered();
+                } catch(Exception e) {}
                 break;
             case CAPTURE_RESOURCE:
                 //
@@ -127,7 +129,7 @@ public class Siege {
                         + " ends turn.");
                 players[currentPlayer].endTurn();
                 for (int i = 0; i < grid.rows; ++i) {
-                    for (int j = 0; j < grid.rows; ++j) {
+                    for (int j = 0; j < grid.cols; ++j) {
                         if (grid.getTile(new Coord(i, j)).isCity()
                                 || grid.getTile(new Coord(i, j)).isResource())
                             mainFrame.updateGridSquare(new Coord(i, j));
