@@ -824,15 +824,15 @@ public class MainGameFrame extends JFrame {
                     Tile currentTile = mapTiles.getTile(new Coord(i, j));
 
                     gridSquares[i][j].setBackground(gridSquares[i][j]
-                            .getBackground());//.brighter());
+                            .getBackground());
                     currentPositionLabel.setText("(Row: " + i + " Col: "
                             + j + ")");
-
+                    
                     if (currentTile.owner != -1) {
                         for (Coord x : currentTile.getOccupant().possibleInfluences) {
                             gridSquares[x.row][x.col]
                                     .setBackground(gridSquares[x.row][x.col]
-                                            .getBackground());//.brighter());
+                                            .getBackground());
                         }
                     }
                 }
