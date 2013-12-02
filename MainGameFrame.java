@@ -603,7 +603,7 @@ public class MainGameFrame extends JFrame {
 
   public class GridSquareMouseListener extends MouseAdapter {
     public void mouseClicked(MouseEvent e) {
-      if (currentSelected != null) {
+      if (currentSelected != null && currentSelected.getOccupant() != null) {
         for (Coord x : currentSelected.getOccupant().possibleMoves) {
           undoOutlineSquare(x);
         }
@@ -617,27 +617,21 @@ public class MainGameFrame extends JFrame {
                   && Siege.players[Siege.grid.getTile(new Coord(i, j)).owner].name
                       .equals(name)) {
                 currentSelected = Siege.grid.getTile(new Coord(i, j));
-                System.out.println("Getting this far.");
-                for (Coord x : currentSelected.getOccupant().possibleMoves) {
-                  outlineSquare(x);
-                }
                 printMyCityPanel(currentSelected);
                 HUDLayout.show(HUDTopPanel, "City");
                 currentHUDCard = "City";
                 cityMainLayout.show(HUDCitySelectMainPanel, "my");
+
               } else if (Siege.grid.getTile(new Coord(i, j)).getOccupant() != null
                   && Siege.grid.getTile(new Coord(i, j)).owner != -1
                   && Siege.players[Siege.grid.getTile(new Coord(i, j)).owner].name
                       .equals(name)) {
                 currentSelected = Siege.grid.getTile(new Coord(i, j));
-                for (Coord x : currentSelected.getOccupant().possibleMoves) {
-                  outlineSquare(x);
-                }
                 printArmyPanel(currentSelected);
                 HUDLayout.show(HUDTopPanel, "Army");
                 currentHUDCard = "City";
-              } else {
-                currentSelected = Siege.grid.getTile(new Coord(i, j));
+
+              } else{  
                 printNonePanel();
                 HUDLayout.show(HUDTopPanel, "None");
                 currentHUDCard = "None";
@@ -682,17 +676,26 @@ public class MainGameFrame extends JFrame {
                   }
                 }
               }
+              if (currentSelected != null
+                  && currentSelected.getOccupant() != null)
+                for (Coord x : currentSelected.getOccupant().possibleMoves) {
+                  undoOutlineSquare(x);
+                }
+              currentSelected = null;
             }
           }
         }
       }
       if (SwingUtilities.isLeftMouseButton(e)) {
-        if (currentSelected != null){
+        if (currentSelected != null && currentSelected.getOccupant() != null) {
           for (Coord x : currentSelected.getOccupant().possibleMoves)
             outlineSquare(x);
         }
       }
-      System.out.println("Current selected: " + currentSelected.coord);
+      if (currentSelected != null)
+        System.out.println("Current selected: " + currentSelected.coord);
+      else
+        System.out.println("Current selected: null");
     }
 
     // simulate mouse entering board to update all tiles
@@ -770,9 +773,7 @@ public class MainGameFrame extends JFrame {
                           .getTile(x))));
                 }
               }
-              for (Coord x : currentTile.getOccupant().possibleMoves){
-                undoOutlineSquare(x);
-              }
+
             } else {
               gridSquares[i][j].setBackground(stringToColor(Siege.grid.getTile(
                   new Coord(i, j)).getColor()));
