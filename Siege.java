@@ -79,23 +79,12 @@ public class Siege {
                 System.out.println("Attack Army");
                 attacker = parser.getFirstCoordinate();
                 target = parser.getSecondCoordinate();
-                System.out.println("attacking army at (" + attacker.row + ", "
-                        + attacker.col + ")");
-                System.out.println("target army at (" + target.row + ", "
-                        + target.col + ")");
-
                 parser.getFirstPlayer();
-
                 break;
             case ATTACK_CITY:
                 System.out.println("Attack City");
                 attacker = parser.getFirstCoordinate();
                 city = parser.getSecondCoordinate();
-                System.out.println("attacking army at (" + attacker.row + ", "
-                        + attacker.col + ")");
-                System.out.println("target city at (" + city.row + ", "
-                        + city.col + ")");
-
                 break;
             case CAPTURE_CITY:
                 System.out.println("Capture City");
@@ -153,14 +142,13 @@ public class Siege {
             case NAME_CHANGE:
                 System.out.println("Name change occured");
                 break;
-            case IS_READY:
-            	System.out.println("You are ready.");
-            	break;
             case WAITING_FOR_PLAYERS:
             	System.out.println("Waiting for players...");
             	break;
             case STARTING_GAME:
             	System.out.println("Starting game...");
+            	
+            	
             	break;
             default:
                 System.out

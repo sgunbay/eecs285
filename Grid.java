@@ -3,7 +3,7 @@ package com.eecs285.siegegame;
 import java.io.*;
 
 public class Grid {
-//tada
+
 	// TESTED AND APPROVED
 	
 	public static int max_row = 30;
@@ -69,7 +69,7 @@ public class Grid {
 				setTile(new Coord(row,col),new TileResource(sz,new Coord(row,col)));
 			}	
 			else if (firstline[0].equalsIgnoreCase("C"))			
-				setTile(new Coord(row,col),new TileResource(Integer.valueOf(firstline[3]),new Coord(row,col)));
+				setTile(new Coord(row,col),new TileCity(Integer.valueOf(firstline[3]),new Coord(row,col)));
 			else
 				System.out.println("Invalid line.");
 				

@@ -25,7 +25,6 @@ public class ActionParser {
         PLAYER_WINS,
         END_TURN,
         NAME_CHANGE,
-        IS_READY,
         WAITING_FOR_PLAYERS,
         STARTING_GAME
     }
@@ -72,11 +71,9 @@ public class ActionParser {
             return ActionType.END_TURN;
         else if (input.contains("changed their name to"))
             return ActionType.NAME_CHANGE;
-        else if (input.contains("All players ready"))
-            return ActionType.IS_READY;
         else if (input.contains("Waiting for all players to be ready"))
             return ActionType.WAITING_FOR_PLAYERS;
-        else if (input.contains("Starting game"))
+        else if (input.contains("Starting the game"))
             return ActionType.STARTING_GAME;
 
         return null;
