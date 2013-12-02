@@ -63,7 +63,7 @@ public class GetNameDialog extends JDialog {
                     try {
                         Siege.sendToServer("NAME: " + getInput());
                         System.out.println("Sending player name (" + getInput() + ") to server..");
-                    } catch (IOException e1) {
+                    } catch (Exception e1) {
                         System.out.println("ERROR: SENDING NAME TO SERVER");
                     }
                     setVisible(false);
