@@ -11,7 +11,7 @@ import com.eecs285.siegegame.ActionParser.ActionType;
 public class Siege {
 
     // These are required for the classes to work properly:
-	public static MainGameFrame mainFrame;
+    public static MainGameFrame mainFrame;
     public static Grid grid;
     public static int numCities;
     public static int numPlayers;
@@ -26,45 +26,49 @@ public class Siege {
     static ObjectInputStream in;
     static int portNum = 45000;
     private final static String IPaddress = "67.194.55.95"; // server IP
-    
-    public static int attemptTrain(Tile city, String unitType){
-    	if (unitType.equalsIgnoreCase("Basic") && city.trainUnitBasic())
-			return 1;	
-		else if (unitType.equalsIgnoreCase("Explorer") && city.trainUnitExplorer())
-			return 1;
-		else if (unitType.equalsIgnoreCase("Attacker") && city.trainUnitAttacker())
-			return 1;
-		else if (unitType.equalsIgnoreCase("Rusher") && city.trainUnitRusher())
-			return 1;
-		else
-			return 0;
+
+    public static int attemptTrain(Tile city, String unitType) {
+        if (unitType.equalsIgnoreCase("Basic") && city.trainUnitBasic())
+            return 1;
+        else if (unitType.equalsIgnoreCase("Explorer")
+                && city.trainUnitExplorer())
+            return 1;
+        else if (unitType.equalsIgnoreCase("Attacker")
+                && city.trainUnitAttacker())
+            return 1;
+        else if (unitType.equalsIgnoreCase("Rusher") && city.trainUnitRusher())
+            return 1;
+        else
+            return 0;
     }
 
     public static void main(String args[]) throws Exception {
         // initialize connection to server (including IO streams)
         initServerConnection();
 
-        //File map = new File("src/Resources/test0.map");
+        // File map = new File("src/Resources/test0.map");
         File map = new File("src/Resources/test1.map");
 
         grid = new Grid(1);
         grid.load(map);
-        
+
         final int rows = grid.rows;
         final int cols = grid.cols;
-       
+
         mainFrame = new MainGameFrame(grid);
 
-        
-        //get player names array from server
+        // get player names array from server
         playerNames = (String[]) in.readObject();
         playerNames = fixDuplicates(playerNames);
-        
+
         numPlayers = playerNames.length;
         players = new Player[numPlayers];
-        for(int i = 0; i < playerNames.length; i++)
-            players[i] = new Player(i,playerNames[i]);       
-        
+        for (int i = 0; i < playerNames.length; i++)
+            players[i] = new Player(i, playerNames[i]);
+
+        // print some helpful information to narration panel for user
+        printInfo(mainFrame, playerNames);
+
         while (true) {
             // Get string from server
             // String fromServer = in.readLine();
@@ -93,39 +97,41 @@ public class Siege {
             case CAPTURE_CITY:
             case MERGE_ARMY:
             case MOVE_ARMY:
-            	Coord me = parser.getFirstCoordinate();
+                Coord me = parser.getFirstCoordinate();
                 Coord victim = parser.getSecondCoordinate();
-            	if (grid.getOccupantAt(me).attemptMove(victim))
-            		mainFrame.printNarration(fromServer);
-            	else
-            		System.out.println("Invalid move attempted.");
-            	mainFrame.updateGridSquare(me);
-            	mainFrame.updateGridSquare(victim);
-            	mainFrame.gridSquareMouseListener.simulateMouseEntered();
+                if (grid.getOccupantAt(me).attemptMove(victim))
+                    mainFrame.printNarration(fromServer);
+                else
+                    System.out.println("Invalid move attempted.");
+                mainFrame.updateGridSquare(me);
+                mainFrame.updateGridSquare(victim);
+                mainFrame.gridSquareMouseListener.simulateMouseEntered();
                 break;
             case CAPTURE_RESOURCE:
-            	//
+                //
                 System.out.println("Capture Resource");
                 resource = parser.getFirstCoordinate();
                 break;
             case CITY_LIBERATED:
                 //
-            	System.out.println("Liberate City");
+                System.out.println("Liberate City");
                 city = parser.getFirstCoordinate();
                 break;
             case CITY_UNDER_SIEGE:
-            	//
+                //
                 System.out.println("Siege City");
                 city = parser.getFirstCoordinate();
                 break;
             case END_TURN:
-                mainFrame.printNarration(players[currentPlayer].name + " ends turn.");
+                mainFrame.printNarration(players[currentPlayer].name
+                        + " ends turn.");
                 players[currentPlayer].endTurn();
-                for (int i = 0; i < grid.rows; ++i){
-                	for (int j = 0; j < grid.rows; ++j){
-                		if (grid.getTile(new Coord(i,j)).isCity() || grid.getTile(new Coord(i,j)).isResource())
-                				mainFrame.updateGridSquare(new Coord(i,j));
-                	}
+                for (int i = 0; i < grid.rows; ++i) {
+                    for (int j = 0; j < grid.rows; ++j) {
+                        if (grid.getTile(new Coord(i, j)).isCity()
+                                || grid.getTile(new Coord(i, j)).isResource())
+                            mainFrame.updateGridSquare(new Coord(i, j));
+                    }
                 }
                 mainFrame.updatePlayer();
                 mainFrame.printNonePanel();
@@ -134,19 +140,21 @@ public class Siege {
                 System.out.println("Lose Units");
                 break;
             case RECRUIT:
-            	city = parser.getFirstCoordinate();
-            	int numUnits = parser.getNumUnits();
-            	String unitType = parser.getTypeUnits();
-            	
-            	Tile t = grid.getTile(city);
-            	int count = 0;
-            	for (int i = 0; i < numUnits; ++i)
-            		count += attemptTrain(t,unitType);
-            	
-            	grid.setTile(city,t);
-            	mainFrame.updateGridSquare(city);
-            	mainFrame.gridSquareMouseListener.simulateMouseEntered();
-            	mainFrame.printNarration(playerNames[currentPlayer] + " trains " + count + " " + unitType + " unit(s) at city " + city);
+                city = parser.getFirstCoordinate();
+                int numUnits = parser.getNumUnits();
+                String unitType = parser.getTypeUnits();
+
+                Tile t = grid.getTile(city);
+                int count = 0;
+                for (int i = 0; i < numUnits; ++i)
+                    count += attemptTrain(t, unitType);
+
+                grid.setTile(city, t);
+                mainFrame.updateGridSquare(city);
+                mainFrame.gridSquareMouseListener.simulateMouseEntered();
+                mainFrame.printNarration(playerNames[currentPlayer]
+                        + " trains " + count + " " + unitType
+                        + " unit(s) at city " + city);
                 break;
             case RESOURCE_RECAPTURED:
                 System.out.println("Recapture Resource");
@@ -166,47 +174,81 @@ public class Siege {
                 System.out.println("Name change occured");
                 break;
             case WAITING_FOR_PLAYERS:
-            	System.out.println("Waiting for players...");
-            	break;
+                System.out.println("Waiting for players...");
+                break;
             case STARTING_GAME:
-            	System.out.println("Starting game...");
-            	for (int i = 0; i < numPlayers; ++i)
-            		players[i].endTurn();
-            	for (int i = 0; i < grid.rows; ++i){
-            		for (int j = 0; j < grid.cols; ++j){
-            			Tile tile = grid.getTile(new Coord(i,j));
-            			if (tile.owner >= numPlayers){
-            				grid.setTile(new Coord(i,j), new TileCity(-1,new Coord(i,j)));	
-                			System.out.println(grid.getTile(new Coord(i,j)).getColor());
-            			}
-            		}
-            	}
-            	mainFrame.updateAllGridSquares();
-            	mainFrame.printNonePanel();
-            	mainFrame.updatePlayer();
-            	
-            	break;
+                System.out.println("Starting game...");
+                for (int i = 0; i < numPlayers; ++i)
+                    players[i].endTurn();
+                for (int i = 0; i < grid.rows; ++i) {
+                    for (int j = 0; j < grid.cols; ++j) {
+                        Tile tile = grid.getTile(new Coord(i, j));
+                        if (tile.owner >= numPlayers) {
+                            grid.setTile(new Coord(i, j), new TileCity(-1,
+                                    new Coord(i, j)));
+                            System.out.println(grid.getTile(new Coord(i, j))
+                                    .getColor());
+                        }
+                    }
+                }
+                mainFrame.updateAllGridSquares();
+                mainFrame.printNonePanel();
+                mainFrame.updatePlayer();
+
+                break;
             default:
-                System.out
-                        .println("ERROR: Action did not specify a known ActionType");
+                System.out.println("ERROR: Action did not specify"
+                        + " a known ActionType");
                 System.exit(-1);
                 break;
             }
         }
     }
 
+    private static void printInfo(MainGameFrame mainFrame, String[] names) {
+        String[] colors = {"Red", "Blue", "Green", "Yellow"};     
+
+        mainFrame.printNarration("Some basic information:");        
+        for(int i = 0; i < names.length; i++)
+            mainFrame.printNarration("  " + names[i] + " is " + colors[i]);
+        
+        mainFrame.printNarration("");
+        mainFrame.printNarration("  The green terrain is a forest - "
+                + "it will slow your armies down");
+        mainFrame.printNarration("  The yellow terrain is quicksand - "
+                + "it will slow your armies down even more!");
+        mainFrame.printNarration("  The brown terrain is a mountain range - "
+                + "it will increase the speed and influence of your units");
+        mainFrame.printNarration("  The blue terrains are bodies of water - "
+                + "these are impassable for armies");
+        mainFrame.printNarration("");
+        mainFrame.printNarration("  You earn gold by preventing your city "
+                + "from being sieged and by infuencing other "
+                + "cities or resources.");
+        mainFrame.printNarration("  Gold can be spent to recruit 4 "
+                + "different unit types");
+        mainFrame.printNarration("     Basic units have moderate speed and "
+                + "attack, and are cheap");
+        mainFrame.printNarration("     Explorer units have high speed and low "
+                + "attack, and are very cheap");
+        mainFrame.printNarration("     Attacker units have low speed and high "
+                + "attack, and are moderately expensive");
+        mainFrame.printNarration("     Rusher units have high speed and "
+                + "attack, and are expensive");
+    }
+
     private static String[] fixDuplicates(String[] names) {
         // if duplicates exist, append 2nd occurrence with a 2, 3rd w/ 3, etc
-        for(int i = 0; i < names.length - 1; i++) {
+        for (int i = 0; i < names.length - 1; i++) {
             String curName = names[i];
             int numOccurrences = 1;
-            for(int j = i + 1; j < names.length; j++) 
-                if(names[j] == curName) {
+            for (int j = i + 1; j < names.length; j++)
+                if (names[j] == curName) {
                     numOccurrences++;
                     names[j] = names[j].concat(" " + numOccurrences);
-                }                    
+                }
         }
-        return names;        
+        return names;
     }
 
     private static void initServerConnection() throws Exception {
@@ -227,7 +269,7 @@ public class Siege {
         for (int i = 0; i < input.length(); i++) {
             if (Character.isLetterOrDigit(input.charAt(i))
                     || input.charAt(i) == ' ' || input.charAt(i) == '('
-                    || input.charAt(i) == ')' || input.charAt(i) == ',' 
+                    || input.charAt(i) == ')' || input.charAt(i) == ','
                     || input.charAt(i) == '.' || input.charAt(i) == '!'
                     || input.charAt(i) == '\'')
                 temp += input.charAt(i);

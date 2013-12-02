@@ -7,11 +7,11 @@ public class TileMountain extends Tile {
 	}
 	
 	public Double getSpdFactor(){
-		return 0.5;
+		return 1.3;
 	}
 	
 	public Double getInfFactor(){
-		return 1.5;
+		return 1.0;
 	}
 	
 }
