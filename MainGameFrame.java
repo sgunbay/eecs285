@@ -546,28 +546,28 @@ public class MainGameFrame extends JFrame {
         if (basicRadioBut_CITY.isSelected()) {
           try {
             Siege.sendToServer(name + " trains " + trainNumberOfUnits.getText()
-                + " Basic unit(s) at city " + currentSelected.coord);
+                + " Basic units at city " + currentSelected.coord);
           } catch (Exception e1) {
             e1.printStackTrace();
           }
         } else if (attackerRadioBut_CITY.isSelected()) {
           try {
             Siege.sendToServer(name + " trains " + trainNumberOfUnits.getText()
-                + " Attacker unit(s) at city " + currentSelected.coord);
+                + " Attacker units at city " + currentSelected.coord);
           } catch (Exception e1) {
             e1.printStackTrace();
           }
         } else if (explorerRadioBut_CITY.isSelected()) {
           try {
             Siege.sendToServer(name + " trains " + trainNumberOfUnits.getText()
-                + " Explorer unit(s) at city " + currentSelected.coord);
+                + " Explorer units at city " + currentSelected.coord);
           } catch (Exception e1) {
             e1.printStackTrace();
           }
         } else if (rusherRadioBut_CITY.isSelected()) {
           try {
             Siege.sendToServer(name + " trains " + trainNumberOfUnits.getText()
-                + " Rusher unit(s) at city " + currentSelected.coord);
+                + " Rusher units at city " + currentSelected.coord);
           } catch (Exception e1) {
             e1.printStackTrace();
           }
@@ -595,6 +595,7 @@ public class MainGameFrame extends JFrame {
           for (Integer j = 0; j < COLS; j++)
             if (e.getSource() == gridSquares[i][j]) {
               // set up the HUD
+
               currentSelected = mapTiles.getTile(new Coord(i, j));
               if (prevSelected != null && (currentSelected != prevSelected)
                   && prevSelected.getOccupant() != null) {
@@ -606,7 +607,7 @@ public class MainGameFrame extends JFrame {
               colNumber = j;
               if (prevSelected == null || prevSelected.getOccupant() == null) {
                 // last click not an army
-                if (currentSelected.getOccupant() != null) {// occupied by army
+                if (currentSelected.getOccupant() != null && !currentSelected.isCity()) {// occupied by army
                   printArmyPanel(currentSelected);
                   HUDLayout.show(HUDTopPanel, "Army");
                   currentHUDCard = "Army";
@@ -615,18 +616,20 @@ public class MainGameFrame extends JFrame {
                   }
                 } else if (currentSelected.isCity()) {// is a city
                   HUDLayout.show(HUDTopPanel, "City");
-                  if (currentSelected.getOccupant() == null) {
+                  if (currentSelected.owner == -1) {
                     printUnoccupiedCityPanel(currentSelected);
                     cityMainLayout.show(HUDCitySelectMainPanel, "unoccupied");
                     currentHUDCard = "City";
-                  } else if (currentSelected.getOccupant().owner == Siege.currentPlayer) {
+                  }
+                  else if (currentSelected.owner == Siege.currentPlayer) {
                     printMyCityPanel(currentSelected);
                     cityMainLayout.show(HUDCitySelectMainPanel, "my");
                     currentHUDCard = "City";
                     for (Coord x : currentSelected.getOccupant().possibleMoves) {
                       outlineSquare(x);
                     }
-                  } else {
+                  }
+                  else {
                     printEnemyCityPanel(currentSelected);
                     cityMainLayout.show(HUDCitySelectMainPanel, "enemy");
                     currentHUDCard = "City";
@@ -709,7 +712,8 @@ public class MainGameFrame extends JFrame {
               }
             }
         if (SwingUtilities.isLeftMouseButton(e)) {
-          outlineSquare(currentSelected.coord);
+          if (currentSelected != null)
+            outlineSquare(currentSelected.coord);
           if (prevSelected != null)
             undoOutlineSquare(prevSelected.coord);
           if (currentSelected == prevSelected) {
