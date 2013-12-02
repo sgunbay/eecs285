@@ -622,10 +622,10 @@ public class MainGameFrame extends JFrame {
                 currentHUDCard = "City";
                 cityMainLayout.show(HUDCitySelectMainPanel, "my");
 
-              } else if (Siege.grid.getTile(new Coord(i, j)).getOccupant() != null
-                  && Siege.grid.getTile(new Coord(i, j)).owner != -1
-                  && Siege.players[Siege.grid.getTile(new Coord(i, j)).owner].name
-                      .equals(name)) {
+              } else if (Siege.grid.getTile(new Coord(i, j)).getOccupant() != null){
+                  //&& Siege.grid.getTile(new Coord(i, j)).owner != -1){
+                  //&& Siege.players[Siege.grid.getTile(new Coord(i, j)).owner].name
+                    //  .equals(name)) {
                 currentSelected = Siege.grid.getTile(new Coord(i, j));
                 printArmyPanel(currentSelected);
                 HUDLayout.show(HUDTopPanel, "Army");
@@ -636,15 +636,17 @@ public class MainGameFrame extends JFrame {
                 HUDLayout.show(HUDTopPanel, "None");
                 currentHUDCard = "None";
               }
-            } else {
+            }
+            else {
               System.out.println(currentSelected);
               if (currentSelected.getOccupant() != null) {
+                
                 System.out.println(currentSelected.getOccupant());
                 for (Coord x : currentSelected.getOccupant().possibleMoves) {
-                  if (new Coord(i, j).equals(x)) {
+                  if (i == x.row && j == x.col) {
                     if (Siege.grid.getTile(x).getOccupant() == null) {
                       try {
-                        Siege.sendToServer(name + "moved army from "
+                        Siege.sendToServer(name + " moved army from "
                             + currentSelected.coord + " to " + x);
                       } catch (Exception ex) {
                         System.exit(-1);
