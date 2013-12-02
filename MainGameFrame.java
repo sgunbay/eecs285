@@ -250,6 +250,9 @@ public class MainGameFrame extends JFrame {
     HUDNoneSelectMiddlePanel.add(currentIncome);
     HUDNoneSelectMiddlePanel.add(new JLabel());
     HUDNoneSelectPanel.add(HUDNoneSelectMiddlePanel, BorderLayout.CENTER);
+    JPanel temporaryPanel = new JPanel(new FlowLayout());
+    temporaryPanel.add(endTurnButton);
+    HUDNoneSelectPanel.add(temporaryPanel, BorderLayout.SOUTH);
 
     // ************************ARMY SELECT HUD***************************
     basicIcon_ARMY = new ImageIcon("src/Resources/basicIcon.png");
@@ -354,7 +357,7 @@ public class MainGameFrame extends JFrame {
 
     myCityTrainingTopPanel.add(new JLabel("Train "));
     myCityTrainingTopPanel.add(trainNumberOfUnits);
-    myCityTrainingTopPanel.add(new JLabel("(up to 20) units"));
+    myCityTrainingTopPanel.add(new JLabel("(up to 100) units"));
     myCityTrainingTopPanel.add(trainingButton);
 
     myCityTrainingPanel.add(myCityTrainingTopPanel, BorderLayout.NORTH);
@@ -517,6 +520,7 @@ public class MainGameFrame extends JFrame {
         } catch (Exception ex) {
           System.exit(-1);
         }
+        readyButton.setEnabled(false);
       }
     }
   }
@@ -1153,7 +1157,6 @@ public class MainGameFrame extends JFrame {
   void printLockedPanel() {
     HUDLockedPanel.add(new JLabel("Currently " + Siege.players[Siege.currentPlayer].name + "'s turn", JLabel.CENTER),
         BorderLayout.CENTER);
-    HUDLockedPanel.add(endTurnButton, BorderLayout.SOUTH);
   }
 
   void removeReady() {
