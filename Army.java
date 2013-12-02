@@ -19,7 +19,7 @@ public class Army{
 	Army(int in_owner, Coord in_coord){
 		owner = in_owner;
 		units = new ArrayDeque<Unit>();
-		dmg = new Double(-1);
+		dmg = new Double(0);
 		spd = new Double(70);
 		coord = in_coord;
 		possibleMoves = new Vector<Coord>();
@@ -77,7 +77,7 @@ public class Army{
 	}
 
 	public int getStrength(){
-		return (int) Math.sqrt(dmg*units.size());
+		return (int) Math.ceil(Math.sqrt(dmg*(units.size())));
 	}	
 	
 	private Army attack(Army target){

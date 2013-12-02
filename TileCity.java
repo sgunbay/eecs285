@@ -61,6 +61,7 @@ public class TileCity extends Tile{
 		
 		// Update map.
 		Siege.grid.setOccupantAt(coord,a);
+		Siege.mainFrame.printMyCityPanel(Siege.grid.getTile(coord));
 		return true;		
 	}
 	

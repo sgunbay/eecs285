@@ -119,9 +119,8 @@ public class Siege {
 
                 break;
             case END_TURN:
-                System.out.println("End Turn");
-                players[currentPlayer].endTurn();                
-                
+                mainFrame.printNarration(players[currentPlayer].name + " ends turn.");
+                players[currentPlayer].endTurn();
                 break;
             case LOSE_UNITS:
                 System.out.println("Lose Units");
@@ -130,7 +129,13 @@ public class Siege {
                 System.out.println("Merge Army");
                 break;
             case MOVE_ARMY:
-                System.out.println("Move Army");
+                Coord me = parser.getFirstCoordinate();
+                Coord victim = parser.getSecondCoordinate();
+            	if (grid.getOccupantAt(me).attemptMove(victim))
+            		mainFrame.printNarration(fromServer);
+            	else
+            		System.out.println("Invalid move attempted.");
+            	
                 break;
             case RECRUIT:
             	city = parser.getFirstCoordinate();
