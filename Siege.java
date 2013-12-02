@@ -25,7 +25,7 @@ public class Siege {
     static DataOutputStream out;
     static ObjectInputStream in;
     static int portNum = 45000;
-    private final static String IPaddress = "127.0.0.1"; // server IP
+    private final static String IPaddress = "67.194.2.78"; // server IP
 
     public static int attemptTrain(Tile city, String unitType) {
         if (unitType.equalsIgnoreCase("Basic") && city.trainUnitBasic())

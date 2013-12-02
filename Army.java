@@ -196,7 +196,10 @@ public class Army{
 		}
 		
 		if (isEmpty()){
-			Siege.grid.setOccupantAt(coord,null);
+			if (Siege.grid.getTile(coord).isCity())
+				Siege.grid.setOccupantAt(coord, new Army(owner, coord));
+			else
+				Siege.grid.setOccupantAt(coord,null);
 		}
 		else if (Siege.grid.getOccupantAt(target) == null)
 			move(target);
@@ -243,13 +246,19 @@ public class Army{
 		for (Coord c : possibleInfluences){
 			Tile t = Siege.grid.getTile(c);	
 			
-			if ((t.isCity() || t.isResource()) && (t.owner != owner) && (t.owner != -1)){	
+			if ((t.isCity()) && (t.owner != owner) && (t.owner != -1)){	
 				t.infers++;
 			}	
 			else if (t.isResource() && (t.owner == -1)){
-				t.owner = owner;
-			}	
-			
+				if (t.infers == 0)
+					t.owner = owner;
+				else
+					t.infers++;
+			}
+			else if (t.isResource() && (t.owner != owner) && (t.owner != -1)){
+				t.owner = -1;
+				t.infers++;
+			}
 			Siege.grid.setTile(c, t);
 		}	
 	}
