@@ -71,10 +71,9 @@ public class MainGameFrame extends JFrame {
   final int ATTACKER_COST;
   final int RUSHER_COST;
   final Integer MAX_ARMY_SIZE = 100;
-  
+
   GetNameDialog getNameDialog;
-  
-  
+
   String name;
   static Integer playerIndex = 0;
   static ArrayList<String> currentNames = new ArrayList<String>();
@@ -134,7 +133,7 @@ public class MainGameFrame extends JFrame {
     EXPLORER_COST = new UnitExplorer().cost;
     ATTACKER_COST = new UnitAttacker().cost;
     RUSHER_COST = new UnitRusher().cost;
-    
+
     TASKBAR_HEIGHT = Toolkit.getDefaultToolkit().getScreenInsets(
         getGraphicsConfiguration()).bottom;
     SCREEN_HEIGHT = (int) GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -169,8 +168,8 @@ public class MainGameFrame extends JFrame {
         gridSquares[i][j] = adding;
         gridSquares[i][j].setLayout(overlay);
         if (mapTiles.getTile(new Coord(i, j)) != null)
-          gridSquares[i][j].setBackground(stringToColor(mapTiles.getTile(new Coord(i, j))
-              .getColor()));
+          gridSquares[i][j].setBackground(stringToColor(mapTiles.getTile(
+              new Coord(i, j)).getColor()));
         else {
           // mapTiles[i][j] is a city and I need to pick the image of the right
           // color
@@ -181,6 +180,7 @@ public class MainGameFrame extends JFrame {
         mapPanel.add(gridSquares[i][j]);
       }
     }
+
     mapPanel.setBorder(BorderFactory.createLineBorder(Color.black));
     add(mapPanel, BorderLayout.CENTER);
 
@@ -456,7 +456,8 @@ public class MainGameFrame extends JFrame {
     HUDCitySelectPanel.add(cityStatus_CITY, BorderLayout.NORTH);
     HUDCitySelectPanel.add(HUDCitySelectMainPanel, BorderLayout.CENTER);
 
-    // **********************************RESOURCE SELECT HUD************************************
+    // **********************************RESOURCE SELECT
+    // HUD************************************
     HUDResSelectPanel = new JPanel(new GridLayout(4, 1));
 
     resourceState = new JLabel("Resource is owned by Jordan", JLabel.CENTER);
@@ -487,6 +488,7 @@ public class MainGameFrame extends JFrame {
 
     add(auxPanel, BorderLayout.WEST);
 
+    updateAllGridSquares();
     pack();
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setVisible(true);
@@ -528,11 +530,13 @@ public class MainGameFrame extends JFrame {
       }
       if (e.getSource() == attackerRadioBut_CITY) {
         System.out.println("Clicked on attacker unit button");
-        trainingButton.setText(getPriceOf(ATTACKER_COST));// price of attacker * num
+        trainingButton.setText(getPriceOf(ATTACKER_COST));// price of attacker *
+                                                          // num
       }
       if (e.getSource() == explorerRadioBut_CITY) {
         System.out.println("Clicked on explorer unit button");
-        trainingButton.setText(getPriceOf(EXPLORER_COST));// price of explorer * num
+        trainingButton.setText(getPriceOf(EXPLORER_COST));// price of explorer *
+                                                          // num
       }
       if (e.getSource() == rusherRadioBut_CITY) {
         System.out.println("Clicked on rusher unit button");
@@ -743,12 +747,12 @@ public class MainGameFrame extends JFrame {
         if (e.getSource() == gridSquares[i][j]) {
           Tile currentTile = mapTiles.getTile(new Coord(i, j));
           if (currentTile.owner == -1)
-            gridSquares[i][j].setBackground(stringToColor(mapTiles.getTile(new Coord(i, j))
-                .getColor()));
+            gridSquares[i][j].setBackground(stringToColor(mapTiles.getTile(
+                new Coord(i, j)).getColor()));
           else
             for (Coord x : currentTile.getOccupant().possibleInfluences)
-              gridSquares[x.row][x.col]
-                  .setBackground(stringToColor(mapTiles.getTile(new Coord(i, j)).getColor()));
+              gridSquares[x.row][x.col].setBackground(stringToColor(mapTiles
+                  .getTile(new Coord(i, j)).getColor()));
         }
       }
     }
@@ -772,7 +776,7 @@ public class MainGameFrame extends JFrame {
 
     if (update.getOccupant() != null) {
       if (update.isCity() == false) {
-        occupantColor = update.getOccupant().getColor();
+        occupantColor = playerToColor(update.getOccupant().getColor());
         strength = update.getOccupant().getStrength();
 
         BufferedImage armyImage = null;
@@ -801,8 +805,11 @@ public class MainGameFrame extends JFrame {
 
         gridSquares[pos.row][pos.col].add(strLabel);
         gridSquares[pos.row][pos.col].add(armyLabel);
-      } else {
-        occupantColor = update.getOccupant().getColor();// must return siege
+      } else if (update.isCity() == true) {
+        occupantColor = playerToColor(update.getOccupant().getColor());//
+                              // must return siege
+        if (update.infers != 0)
+          occupantColor = "siege";
         strength = update.getOccupant().getStrength();
 
         BufferedImage armyImage = null;
@@ -832,43 +839,50 @@ public class MainGameFrame extends JFrame {
         gridSquares[pos.row][pos.col].add(strLabel);
         gridSquares[pos.row][pos.col].add(armyLabel);
       }
-    } else {//resource or none
-      if (update.isResource()) {
-        occupantColor = update.getColor();// must return white
-        strength = update.income;
 
-        gridSquares[pos.row][pos.col]
-            .setBackground(stringToColor(guessResourceBackground(update)));
-        
-        BufferedImage armyImage = null;
-        try {
-          armyImage = ImageIO.read(new File("src/resources/" + occupantColor
-              + "Resource.png"));
-          armyImage = resizeImage(SQUARESIZE, armyImage);
-        } catch (IOException e) {
-          e.printStackTrace();
+      else if (update.isResource()) {// resource or none
+        if (update.isResource()) {
+          System.out.println("Should not print");
+          occupantColor = playerToColor(update.getColor());// must
+                                // return white
+          strength = update.income;
+
+          gridSquares[pos.row][pos.col]
+              .setBackground(stringToColor(guessResourceBackground(update)));
+
+          BufferedImage armyImage = null;
+          try {
+            armyImage = ImageIO.read(new File("src/resources/" + occupantColor
+                + "Resource.png"));
+            armyImage = resizeImage(SQUARESIZE, armyImage);
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+          armyLabel = new JLabel(new ImageIcon(armyImage));
+
+          strLabel = new JLabel(strength.toString(), JLabel.CENTER);
+          strLabel
+              .setFont(new Font(Font.MONOSPACED, Font.BOLD, SQUARESIZE / 2));
+          strLabel.setForeground(Color.BLACK);
+
+          if (strength.toString().length() == 1)
+            armyLabel.setAlignmentX(0.36f);
+          if (strength.toString().length() == 2)
+            armyLabel.setAlignmentX(0.21f);
+          if (strength.toString().length() == 3) {
+            strLabel.setFont(new Font(Font.MONOSPACED, Font.BOLD, SQUARESIZE
+                / 2 - SQUARESIZE / 9));
+            armyLabel.setAlignmentX(0.157f);
+          }
+
+          gridSquares[pos.row][pos.col].add(strLabel);
+          gridSquares[pos.row][pos.col].add(armyLabel);
+        } else {
+          if (strLabel != null)
+            gridSquares[pos.row][pos.col].remove(strLabel);
+          if (armyLabel != null)
+            gridSquares[pos.row][pos.col].remove(armyLabel);
         }
-        armyLabel = new JLabel(new ImageIcon(armyImage));
-
-        strLabel = new JLabel(strength.toString(), JLabel.CENTER);
-        strLabel.setFont(new Font(Font.MONOSPACED, Font.BOLD, SQUARESIZE / 2));
-        strLabel.setForeground(Color.BLACK);
-
-        if (strength.toString().length() == 1)
-          armyLabel.setAlignmentX(0.36f);
-        if (strength.toString().length() == 2)
-          armyLabel.setAlignmentX(0.21f);
-        if (strength.toString().length() == 3) {
-          strLabel.setFont(new Font(Font.MONOSPACED, Font.BOLD, SQUARESIZE / 2
-              - SQUARESIZE / 9));
-          armyLabel.setAlignmentX(0.157f);
-        }
-
-        gridSquares[pos.row][pos.col].add(strLabel);
-        gridSquares[pos.row][pos.col].add(armyLabel);
-      } else {
-        gridSquares[pos.row][pos.col].remove(strLabel);
-        gridSquares[pos.row][pos.col].remove(armyLabel);
       }
     }
   }
@@ -904,6 +918,21 @@ public class MainGameFrame extends JFrame {
       return Color.BLUE;
     else
       return null;
+  }
+
+  String playerToColor(String in) {
+    if (in == null)
+      return "white";
+    else if (in.equalsIgnoreCase("player0color"))
+      return "red";
+    else if (in.equalsIgnoreCase("player1color"))
+      return "blue";
+    else if (in.equalsIgnoreCase("player2color"))
+      return "green";
+    else if (in.equalsIgnoreCase("player3color"))
+      return "yellow";
+    else
+      return "siege";
   }
 
   String getPlayerName() {
@@ -1117,41 +1146,53 @@ public class MainGameFrame extends JFrame {
   String guessResourceBackground(Tile res) {
     int plains = 0, forest = 0, mountain = 0, muddy = 0;
     if (res.coord.row > 0) {// not top
-      if (mapTiles.getTile(new Coord(res.coord.row - 1,res.coord.col)).getColor() == "forest")
+      if (mapTiles.getTile(new Coord(res.coord.row - 1, res.coord.col))
+          .getColor() == "forest")
         forest++;
-      else if (mapTiles.getTile(new Coord(res.coord.row - 1,res.coord.col)).getColor() == "mountain")
+      else if (mapTiles.getTile(new Coord(res.coord.row - 1, res.coord.col))
+          .getColor() == "mountain")
         mountain++;
-      else if (mapTiles.getTile(new Coord(res.coord.row - 1,res.coord.col)).getColor() == "muddy")
+      else if (mapTiles.getTile(new Coord(res.coord.row - 1, res.coord.col))
+          .getColor() == "muddy")
         muddy++;
       else
         plains++;
     }
     if (res.coord.row < ROWS - 1) {// not bottom
-      if (mapTiles.getTile(new Coord(res.coord.row + 1, res.coord.col)).getColor() == "forest")
+      if (mapTiles.getTile(new Coord(res.coord.row + 1, res.coord.col))
+          .getColor() == "forest")
         forest++;
-      else if (mapTiles.getTile(new Coord(res.coord.row + 1, res.coord.col)).getColor() == "mountain")
+      else if (mapTiles.getTile(new Coord(res.coord.row + 1, res.coord.col))
+          .getColor() == "mountain")
         mountain++;
-      else if (mapTiles.getTile(new Coord(res.coord.row + 1, res.coord.col)).getColor() == "muddy")
+      else if (mapTiles.getTile(new Coord(res.coord.row + 1, res.coord.col))
+          .getColor() == "muddy")
         muddy++;
       else
         plains++;
     }
     if (res.coord.col > 0) {// not left
-      if (mapTiles.getTile(new Coord(res.coord.row, res.coord.col - 1)).getColor() == "forest")
+      if (mapTiles.getTile(new Coord(res.coord.row, res.coord.col - 1))
+          .getColor() == "forest")
         forest++;
-      else if (mapTiles.getTile(new Coord(res.coord.row, res.coord.col - 1)).getColor() == "mountain")
+      else if (mapTiles.getTile(new Coord(res.coord.row, res.coord.col - 1))
+          .getColor() == "mountain")
         mountain++;
-      else if (mapTiles.getTile(new Coord(res.coord.row, res.coord.col - 1)).getColor() == "muddy")
+      else if (mapTiles.getTile(new Coord(res.coord.row, res.coord.col - 1))
+          .getColor() == "muddy")
         muddy++;
       else
         plains++;
     }
     if (res.coord.col < COLS - 1) {// not right
-      if (mapTiles.getTile(new Coord(res.coord.row, res.coord.col + 1)).getColor() == "forest")
+      if (mapTiles.getTile(new Coord(res.coord.row, res.coord.col + 1))
+          .getColor() == "forest")
         forest++;
-      else if (mapTiles.getTile(new Coord(res.coord.row, res.coord.col + 1)).getColor() == "mountain")
+      else if (mapTiles.getTile(new Coord(res.coord.row, res.coord.col + 1))
+          .getColor() == "mountain")
         mountain++;
-      else if (mapTiles.getTile(new Coord(res.coord.row, res.coord.col + 1)).getColor() == "muddy")
+      else if (mapTiles.getTile(new Coord(res.coord.row, res.coord.col + 1))
+          .getColor() == "muddy")
         muddy++;
       else
         plains++;
