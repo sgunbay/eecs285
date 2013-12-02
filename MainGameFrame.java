@@ -789,17 +789,18 @@ public class MainGameFrame extends JFrame {
 
   void updateGridSquare(Coord pos) {
     Tile update = Siege.grid.getTile(pos);
-    mapTiles.setTile(new Coord(pos.row, pos.col), update);
+    //mapTiles.setTile(new Coord(pos.row, pos.col), update);
     gridSquares[pos.row][pos.col]
         .setBackground(stringToColor(update.getColor()));
     String occupantColor = null;
     Integer strength = null;
     JLabel strLabel = null, armyLabel = null;
-
-    if (update.getOccupant() != null) {
-      if (update.isCity() == false) {
-        occupantColor = playerToColor(update.getOccupant().getColor());
-        strength = update.getOccupant().getStrength();
+      if (update.isCity() == false && update.getOccupant() != null) {
+        occupantColor = playerToColor(update.getColor());
+        if (update.getOccupant() != null)
+          strength = update.getOccupant().getStrength();
+        else
+          strength = -1;
 
         BufferedImage armyImage = null;
         try {
@@ -810,10 +811,15 @@ public class MainGameFrame extends JFrame {
           e.printStackTrace();
         }
         armyLabel = new JLabel(new ImageIcon(armyImage));
+        
 
-        strLabel = new JLabel(strength.toString(), JLabel.CENTER);
-        strLabel.setFont(new Font(Font.MONOSPACED, Font.BOLD, SQUARESIZE / 2));
-        strLabel.setForeground(Color.BLACK);
+        if (strength != -1){
+          strLabel = new JLabel(strength.toString(), JLabel.CENTER);
+          strLabel.setFont(new Font(Font.MONOSPACED, Font.BOLD, SQUARESIZE / 2));
+          strLabel.setForeground(Color.BLACK);
+        }
+        else
+          strLabel = new JLabel();
 
         if (strength.toString().length() == 1)
           armyLabel.setAlignmentX(0.36f);
@@ -824,30 +830,39 @@ public class MainGameFrame extends JFrame {
               - SQUARESIZE / 9));
           armyLabel.setAlignmentX(0.157f);
         }
-
+        gridSquares[pos.row][pos.col].removeAll();
         gridSquares[pos.row][pos.col].add(strLabel);
         gridSquares[pos.row][pos.col].add(armyLabel);
-      } else if (update.isCity() == true) {
-        occupantColor = playerToColor(update.getOccupant().getColor());//
-        // must return siege
-        if (update.infers != 0)
-          occupantColor = "siege";
-        strength = update.getOccupant().getStrength();
-
-        BufferedImage armyImage = null;
+      }
+      else if (update.isCity() == true) {
+        String myOccupantColor = playerToColor(update.getColor());
+        if (update.getOccupant() != null)
+          strength = update.getOccupant().getStrength();
+        else
+          strength = -1;
+        System.out.println(strength);
+        System.out.println("I grabbed a city!");
+        myOccupantColor = "src/resources/" + myOccupantColor;
+        myOccupantColor += "City.png";
+        System.out.println(myOccupantColor);
+        
+        BufferedImage cityImage = null;
         try {
-          armyImage = ImageIO.read(new File("src/resources/" + occupantColor
-              + "City.png"));
-          armyImage = resizeImage(SQUARESIZE, armyImage);
+          cityImage = ImageIO.read(new File(myOccupantColor));
+          cityImage = resizeImage(SQUARESIZE, cityImage);
         } catch (IOException e) {
           e.printStackTrace();
         }
-        armyLabel = new JLabel(new ImageIcon(armyImage));
-
-        strLabel = new JLabel(strength.toString(), JLabel.CENTER);
-        strLabel.setFont(new Font(Font.MONOSPACED, Font.BOLD, SQUARESIZE / 2));
-        strLabel.setForeground(Color.BLACK);
-
+        armyLabel = new JLabel(new ImageIcon(cityImage));
+        
+        if (strength != -1){
+          strLabel = new JLabel(strength.toString(), JLabel.CENTER);
+          strLabel.setFont(new Font(Font.MONOSPACED, Font.BOLD, SQUARESIZE / 2));
+          strLabel.setForeground(Color.BLACK);
+        }
+        else
+          strLabel = new JLabel();
+        
         if (strength.toString().length() == 1)
           armyLabel.setAlignmentX(0.36f);
         if (strength.toString().length() == 2)
@@ -858,6 +873,7 @@ public class MainGameFrame extends JFrame {
           armyLabel.setAlignmentX(0.157f);
         }
 
+        gridSquares[pos.row][pos.col].removeAll();
         gridSquares[pos.row][pos.col].add(strLabel);
         gridSquares[pos.row][pos.col].add(armyLabel);
       }
@@ -897,13 +913,14 @@ public class MainGameFrame extends JFrame {
             armyLabel.setAlignmentX(0.157f);
           }
 
+          gridSquares[pos.row][pos.col].removeAll();
           gridSquares[pos.row][pos.col].add(strLabel);
           gridSquares[pos.row][pos.col].add(armyLabel);
         } else {
           gridSquares[pos.row][pos.col].removeAll();
         }
       }
-    }
+    
   }
 
   void updateAllGridSquares() {
@@ -951,7 +968,6 @@ public class MainGameFrame extends JFrame {
     else if (in.equalsIgnoreCase("player3color"))
       return "yellow";
     else
-      // resourceDefault or cityDefault
       return "white";
   }
 
