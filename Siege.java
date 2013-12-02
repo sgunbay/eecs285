@@ -142,7 +142,8 @@ public class Siege {
             	for (int i = 0; i < numUnits; ++i)
             		count += attemptTrain(t,unitType);
             	
-            	mainFrame.printNarration(players[currentPlayer] + " trains " + count + " " + unitType + " unit(s) at city " + city);
+            	mainFrame.updateGridSquare(city);
+            	mainFrame.printNarration(playerNames[currentPlayer] + " trains " + count + " " + unitType + " unit(s) at city " + city);
                 break;
             case RESOURCE_RECAPTURED:
                 System.out.println("Recapture Resource");

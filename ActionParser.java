@@ -37,7 +37,7 @@ public class ActionParser {
             return ActionType.ATTACK_ARMY;
         else if (input.contains("attacks") && input.contains("city"))
             return ActionType.ATTACK_CITY;
-        else if (input.contains("trained"))
+        else if (input.contains("trains"))
             return ActionType.RECRUIT;
         else if (input.contains("loses units"))
             return ActionType.LOSE_UNITS;
