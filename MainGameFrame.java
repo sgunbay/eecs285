@@ -121,7 +121,7 @@ public class MainGameFrame extends JFrame {
   JLabel resourceState;
   JLabel resourceBonus;
 
-  public MainGameFrame(Grid grid) throws Exception{
+  public MainGameFrame(Grid grid) throws Exception {
     super("Siege");
     ImageIcon icon = new ImageIcon("src/Resources/castleIcon3.png");
     setIconImage(icon.getImage());
@@ -739,27 +739,26 @@ public class MainGameFrame extends JFrame {
         }
       }
     }
- // simulate mouse entering board to update all tiles
-    public void simulateMouseEntered() {
-        for (Integer i = 0; i < ROWS; i++) {
-            for (Integer j = 0; j < COLS; j++) {
-                Tile currentTile = Siege.grid.getTile(new Coord(i, j));
 
-                gridSquares[i][j].setBackground(gridSquares[i][j]
-                        .getBackground());
-                currentPositionLabel.setText("(Row: " + i + " Col: "
-                        + j + ")");
-                
-                if (currentTile.owner != -1) {
-                    for (Coord x : currentTile.getOccupant().possibleInfluences) {
-                        gridSquares[x.row][x.col]
-                                .setBackground(gridSquares[x.row][x.col]
-                                        .getBackground());
-                    }
-                }
+    // simulate mouse entering board to update all tiles
+    public void simulateMouseEntered() {
+      for (Integer i = 0; i < ROWS; i++) {
+        for (Integer j = 0; j < COLS; j++) {
+          Tile currentTile = Siege.grid.getTile(new Coord(i, j));
+
+          gridSquares[i][j].setBackground(gridSquares[i][j].getBackground());
+          currentPositionLabel.setText("(Row: " + i + " Col: " + j + ")");
+
+          if (currentTile.owner != -1) {
+            for (Coord x : currentTile.getOccupant().possibleInfluences) {
+              gridSquares[x.row][x.col].setBackground(gridSquares[x.row][x.col]
+                  .getBackground());
             }
+          }
         }
+      }
     }
+
     public void mouseEntered(MouseEvent e) {
       for (Integer i = 0; i < ROWS; i++) {
         for (Integer j = 0; j < COLS; j++) {
@@ -770,7 +769,9 @@ public class MainGameFrame extends JFrame {
                 .brighter());
             currentPositionLabel.setText("(Row: " + i + " Col: " + j + ")");
 
-            if (currentTile.getOccupant() != null && Siege.players[currentTile.getOccupant().owner].name.equals(name)) {
+            if (currentTile.getOccupant() != null
+                && Siege.players[currentTile.getOccupant().owner].name
+                    .equals(name)) {
               for (Coord x : currentTile.getOccupant().possibleInfluences) {
                 gridSquares[x.row][x.col]
                     .setBackground(gridSquares[x.row][x.col].getBackground()
@@ -779,15 +780,13 @@ public class MainGameFrame extends JFrame {
               }
             }
             /*
-            if (mapTiles.getTile(new Coord(i, j)).getOccupant() != null
-                && mapTiles.getTile(new Coord(i, j)).getOccupant().owner != -1) {
-              for (Coord x : currentTile.getOccupant().possibleInfluences) {
-                gridSquares[x.row][x.col]
-                    .setBackground(gridSquares[x.row][x.col].getBackground()
-                        .brighter());
-              }
-            }
-            */
+             * if (mapTiles.getTile(new Coord(i, j)).getOccupant() != null &&
+             * mapTiles.getTile(new Coord(i, j)).getOccupant().owner != -1) {
+             * for (Coord x : currentTile.getOccupant().possibleInfluences) {
+             * gridSquares[x.row][x.col]
+             * .setBackground(gridSquares[x.row][x.col].getBackground()
+             * .brighter()); } }
+             */
           }
         }
       }
@@ -798,15 +797,17 @@ public class MainGameFrame extends JFrame {
         for (Integer j = 0; j < COLS; j++) {
           if (e.getSource() == gridSquares[i][j]) {
             Tile currentTile = Siege.grid.getTile(new Coord(i, j));
-            if (currentTile.owner == -1)
+            if (currentTile.getOccupant() != null
+                && Siege.players[currentTile.getOccupant().owner].name
+                    .equals(name)) {
+              for (Coord x : currentTile.getOccupant().possibleInfluences) {
+                gridSquares[x.row][x.col]
+                    .setBackground(stringToColor(Siege.grid.getTile(x)
+                        .getColor()));
+              }
+            } else {
               gridSquares[i][j].setBackground(stringToColor(Siege.grid.getTile(
                   new Coord(i, j)).getColor()));
-            else {
-              for (Coord x : currentTile.getOccupant().possibleInfluences) {
-                gridSquares[x.row][x.col].setBackground(stringToColor(Siege.grid
-                    .getTile(x).getColor()));
-                System.out.println(Siege.grid.getTile(x).getColor());
-              }
             }
           }
         }
@@ -821,38 +822,42 @@ public class MainGameFrame extends JFrame {
         .getLength());
   }
 
-  void updateGridSquare(Coord pos) throws Exception{
-    gridSquares[pos.row][pos.col].removeAll();
+  void updateGridSquare(Coord pos) throws Exception {
+    if (gridSquares[pos.row][pos.col].getComponentCount() != 0){
+      gridSquares[pos.row][pos.col].removeAll();
+      gridSquares[pos.row][pos.col].repaint();
+    }
     Tile upTile = Siege.grid.getTile(pos);
     setBackgroundOfGridSquare(upTile);
     JLabel imageLabel = null, textLabel = new JLabel("");
     textLabel.setForeground(Color.BLACK);
-    if (upTile.isCity()){
-      BufferedImage cityImage = ImageIO.read(new File(getPathTo(upTile.getColor(), "City")));
+    if (upTile.isCity()) {
+      BufferedImage cityImage = ImageIO.read(new File(getPathTo(
+          upTile.getColor(), "City")));
       cityImage = resizeImage(SQUARESIZE, cityImage);
-      String cityStrength = ""; 
+      String cityStrength = "";
       if (upTile.getOccupant() != null)
         cityStrength = String.valueOf(upTile.getOccupant().getStrength());
       imageLabel = new JLabel(new ImageIcon(cityImage));
       textLabel.setText(cityStrength);
-    }
-    else if (upTile.isResource()){
-      BufferedImage resImage = ImageIO.read(new File(getPathTo(upTile.getColor(), "Resource")));
+    } else if (upTile.isResource()) {
+      BufferedImage resImage = ImageIO.read(new File(getPathTo(
+          upTile.getColor(), "Resource")));
       resImage = resizeImage(SQUARESIZE, resImage);
       String resourceBonus = String.valueOf(upTile.income);
       imageLabel = new JLabel(new ImageIcon(resImage));
       textLabel.setText(resourceBonus);
-    }
-    else if (upTile.getOccupant() != null){
+    } else if (upTile.getOccupant() != null) {
       String armyColor = playerToColor(upTile.getOccupant().getColor());
-      BufferedImage armyImage = ImageIO.read(new File("src/Resources/" + armyColor + "Army.png"));
+      BufferedImage armyImage = ImageIO.read(new File("src/Resources/"
+          + armyColor + "Army.png"));
       armyImage = resizeImage(SQUARESIZE, armyImage);
       String armyStrength = String.valueOf(upTile.getOccupant().getStrength());
       imageLabel = new JLabel(new ImageIcon(armyImage));
       textLabel.setText(armyStrength);
     }
 
-    if (textLabel != null){
+    if (textLabel != null) {
       textLabel.setFont(new Font(Font.MONOSPACED, Font.BOLD, SQUARESIZE / 2));
       if (textLabel.getText().length() == 1)
         imageLabel.setAlignmentX(0.36f);
@@ -864,41 +869,41 @@ public class MainGameFrame extends JFrame {
         imageLabel.setAlignmentX(0.157f);
       }
     }
-    
-    System.out.println(textLabel.getText());
+
     gridSquares[pos.row][pos.col].add(textLabel);
     if (imageLabel != null)
       gridSquares[pos.row][pos.col].add(imageLabel);
-
-
-    
     return;
   }
 
-  void setBackgroundOfGridSquare(Tile in){
+  void setBackgroundOfGridSquare(Tile in) {
     String color = in.getColor();
     if (in.isCity() || in.isResource())
-      color = guessResourceBackground(in); 
+      color = guessResourceBackground(in);
     else if (color.equals("plains"))
-      gridSquares[in.coord.row][in.coord.col].setBackground(Color.GREEN.darker());
+      gridSquares[in.coord.row][in.coord.col].setBackground(Color.GREEN
+          .darker());
     else if (color.equals("forest"))
-      gridSquares[in.coord.row][in.coord.col].setBackground(Color.green.darker().darker());
+      gridSquares[in.coord.row][in.coord.col].setBackground(Color.green
+          .darker().darker());
     else if (color.equals("muddy"))
-      gridSquares[in.coord.row][in.coord.col].setBackground(new Color(90, 90, 0));
+      gridSquares[in.coord.row][in.coord.col]
+          .setBackground(new Color(90, 90, 0));
     else if (color.equals("mountain"))
-      gridSquares[in.coord.row][in.coord.col].setBackground(new Color(90, 50, 0));
+      gridSquares[in.coord.row][in.coord.col]
+          .setBackground(new Color(90, 50, 0));
     else if (color.equals("water"))
       gridSquares[in.coord.row][in.coord.col].setBackground(Color.BLUE);
-    else{
+    else {
       System.out.println("Unable to set background of grid square");
     }
   }
-  
-  String getPathTo(String playerColor, String tileType){
+
+  String getPathTo(String playerColor, String tileType) {
     String path = playerToColor(playerColor);
     return "src/resources/" + path + tileType + ".png";
   }
-  
+
   void updateAllGridSquares() throws Exception {
     for (int i = 0; i < ROWS; i++)
       for (int j = 0; j < COLS; j++)
