@@ -5,7 +5,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import com.eecs285.siegegame.ActionParser.ActionType;
 
@@ -16,12 +18,16 @@ public class Siege {
     public static int numCities;
     public static int currentPlayer;
     public static Player[] players;
+    public static String[] playerNames;
 
     // required for networking functionality
-    static BufferedReader in;
+    // static BufferedReader in;
     static DataOutputStream out;
+    static ObjectInputStream in;
     static int portNum = 45000;
     private final static String IPaddress = "127.0.0.1"; // server IP
+    
+    
 
     public static void main(String args[]) throws Exception {
         // initialize connection to server (including IO streams)
@@ -47,25 +53,31 @@ public class Siege {
         Coord oneOne = new Coord(1, 1);
         Tile plains = new TilePlains(oneOne);
         mainFrame.updateGridSquare(oneOne, plains);
-
-        // testing max
-        // sendToServer("someone attacks someone else");
-        // sendToServer("Player's army at (1, 2) attacks player's army/city at (3, 4)");
+        
+        //get player names array from server
+        playerNames = (String[]) in.readObject();
+        playerNames = fixDuplicates(playerNames);
+        for(int i = 0; i < 4; i++) {
+            System.out.println("playerNames[" + i + "] = " + playerNames[i]);
+        }
+        
+        //create player objects here
+        
+        
+        
 
         while (true) {
-            //Get string from server            
-            String fromServer = in.readLine();
-            
-            // Remove any non letter/digit/space chars from string
-            String usableData = "";
-            for(int i = 0; i < fromServer.length(); i++) {
-                Character temp = fromServer.charAt(i);
-                if(Character.isLetterOrDigit(temp) || temp == ' ')
-                    usableData += temp;
-            }
-            
+            // Get string from server
+            // String fromServer = in.readLine();
+            String fromServer = (String) in.readObject();
+            fromServer = Siege.parseServerString(fromServer);
+            System.out.println("FROM SERVER: " + fromServer);
+
+            // Instantiate ActionParser
+            ActionParser parser = new ActionParser(fromServer);
+
             // Get action type from string and initialize variables
-            ActionType atype = ActionParser.getActionType(usableData);
+            ActionType atype = parser.getActionType();
             Coord attacker = null, target = null;
             Coord city = null, resource = null;
 
@@ -77,38 +89,52 @@ public class Siege {
 
             // perform action depending on what server string specifies
             switch (atype) {
-            case ATTACK:
-                System.out.println("Attack");
-                attacker = ActionParser.getFirstCoordinate(fromServer);
-                target = ActionParser.getSecondCoordinate(fromServer);
-                System.out.println("attacker at (" + attacker.row + ", "
+            case ATTACK_ARMY:
+                System.out.println("Attack Army");
+                attacker = parser.getFirstCoordinate();
+                target = parser.getSecondCoordinate();
+                System.out.println("attacking army at (" + attacker.row + ", "
                         + attacker.col + ")");
-                System.out.println("target at (" + target.row + ", "
-                        + target.row + ")");
+                System.out.println("target army at (" + target.row + ", "
+                        + target.col + ")");
+
+                parser.getFirstPlayer();
+
+                break;
+            case ATTACK_CITY:
+                System.out.println("Attack City");
+                attacker = parser.getFirstCoordinate();
+                city = parser.getSecondCoordinate();
+                System.out.println("attacking army at (" + attacker.row + ", "
+                        + attacker.col + ")");
+                System.out.println("target city at (" + city.row + ", "
+                        + city.col + ")");
 
                 break;
             case CAPTURE_CITY:
                 System.out.println("Capture City");
-                city = ActionParser.getFirstCoordinate(fromServer);
+                city = parser.getFirstCoordinate();
 
                 break;
             case CAPTURE_RESOURCE:
                 System.out.println("Capture Resource");
-                resource = ActionParser.getFirstCoordinate(fromServer);
+                resource = parser.getFirstCoordinate();
 
                 break;
             case CITY_LIBERATED:
                 System.out.println("Liberate City");
-                city = ActionParser.getFirstCoordinate(fromServer);
+                city = parser.getFirstCoordinate();
 
                 break;
             case CITY_UNDER_SIEGE:
                 System.out.println("Siege City");
-                city = ActionParser.getFirstCoordinate(fromServer);
+                city = parser.getFirstCoordinate();
 
                 break;
             case END_TURN:
                 System.out.println("End Turn");
+                players[currentPlayer].endTurn();                
+                
                 break;
             case LOSE_UNITS:
                 System.out.println("Lose Units");
@@ -124,12 +150,12 @@ public class Siege {
                 break;
             case RESOURCE_RECAPTURED:
                 System.out.println("Recapture Resource");
-                resource = ActionParser.getFirstCoordinate(fromServer);
+                resource = parser.getFirstCoordinate();
 
                 break;
             case RESOURCE_UNDER_CONFLICT:
                 System.out.println("Resource Contested");
-                resource = ActionParser.getFirstCoordinate(fromServer);
+                resource = parser.getFirstCoordinate();
 
                 break;
             case PLAYER_DEFEATED:
@@ -142,24 +168,49 @@ public class Siege {
                 System.out.println("Name change occured");
                 break;
             default:
-                System.out.println("ERROR: Action did not specify a known ActionType");
+                System.out
+                        .println("ERROR: Action did not specify a known ActionType");
                 System.exit(-1);
                 break;
             }
         }
     }
 
+    private static String[] fixDuplicates(String[] names) {
+        // if duplicates exist, append 2nd occurrence with a 2, 3rd w/ 3, etc
+        for(int i = 0; i < names.length - 1; i++) {
+            String curName = names[i];
+            int numOccurrences = 1;
+            for(int j = i + 1; j < names.length; j++) 
+                if(names[j] == curName) {
+                    numOccurrences++;
+                    names[j] = names[j].concat(" " + numOccurrences);
+                }                    
+        }
+        return names;        
+    }
+
     private static void initServerConnection() throws Exception {
         // create a connection to the server and initialize IO streams
         Socket cSocket = new Socket(IPaddress, portNum);
         out = new DataOutputStream(cSocket.getOutputStream());
-        DataInputStream dis = new DataInputStream(cSocket.getInputStream());
-        in = new BufferedReader(new InputStreamReader(dis));
+        in = new ObjectInputStream(cSocket.getInputStream());
     }
 
     public static void sendToServer(String data) throws IOException {
         // send the string parameter to the server
         data += '\n';
         out.writeChars(data);
+    }
+
+    public static String parseServerString(String input) {
+        String temp = "";
+        for (int i = 0; i < input.length(); i++) {
+            if (Character.isLetterOrDigit(input.charAt(i))
+                    || input.charAt(i) == ' ' || input.charAt(i) == '('
+                    || input.charAt(i) == ')' || input.charAt(i) == ',')
+                temp += input.charAt(i);
+        }
+        return temp;
     }
 }

@@ -1,16 +1,20 @@
 package com.eecs285.siegegame;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class MiniServer extends Thread {
     private Socket socket = null;
+    String playerName;
     int clientNum;
     BufferedReader iStream;
-    DataOutputStream oStream;
+    //DataOutputStream oStream;
+    ObjectOutputStream oStream;
 
     public MiniServer(Socket socket, int numClient) {
         super("MiniServer");
@@ -21,74 +25,83 @@ public class MiniServer extends Thread {
     public void run() {
         // Announce connection of player
         System.out.println("Player " + clientNum + " Connected");
-        
+
         // get IO functionality to client
         try {
             DataInputStream is = new DataInputStream(socket.getInputStream());
             iStream = new BufferedReader(new InputStreamReader(is));
-            oStream = new DataOutputStream(socket.getOutputStream());
+            //oStream = new DataOutputStream(socket.getOutputStream());
+            oStream = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             System.out.println("ERROR: getting InputStream or OutputStream");
         }
-        
-        //first, get name from user
+
+        // first, get name from user
         String data;
         boolean namePicked = false;
-        while(!namePicked) {
-            if((data = getInput(iStream)) != null) {          
+        while (!namePicked) {
+            if ((data = getInput(iStream)) != null) {
                 String usableData = "";
-                for(int i = 0; i < data.length(); i++) {
-                    if(Character.isLetterOrDigit(data.charAt(i)))
+                for (int i = 0; i < data.length(); i++) {
+                    if (Character.isLetterOrDigit(data.charAt(i)))
                         usableData += data.charAt(i);
                 }
-                
-                if(usableData.contains("NAME")) {
-                    usableData = usableData.substring(4);  
+
+                if (usableData.contains("NAME")) {                    
+                    usableData = usableData.substring(4);
                     Server.playerNames[clientNum] = usableData;
-                    System.out.println("Player " + clientNum + " has changed their name to " + usableData);
-                    broadcastToClients("Player " + clientNum + " has changed their name to " + usableData + '\n');
-                    namePicked = true;                            
+                    Server.chosen[clientNum] = true;
+                    
+
+                    
+
+                    playerName = usableData;
+                    System.out.println("Player " + clientNum
+                            + " has changed their name to " + usableData);
+                    namePicked = true;
                 }
             }
         }
-        
-        
-        //for(int i = 0; i < Server.MAX_PLAYERS; i++)
-        //    System.out.println(Server.playerNames[i]);
-        
-        
-        
+
         while (true) {
-            // if data has been received from client
-            if ((data = getInput(iStream)) != null) {                
+            // if data has been received from client, send it to all clients
+            if ((data = getInput(iStream)) != null) {
                 System.out.println(data);
                 data += '\n';
                 broadcastToClients(data);
             }
+            
+            // sleep to prevent overheating of processor in case 
+            // clients disconnect (not important to game)
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {}
         }
-    }    
+    }
 
-    // helpful methods
+    // get data from clients
     public String getInput(BufferedReader istream) {
         String receivedData = null;
         try {
             receivedData = istream.readLine();
         } catch (IOException e) {
-            System.out.println("ERROR: getting data");
+            System.err.println("ERROR: Getting data from clients. Quitting.");
             System.exit(-1);
         }
         return receivedData;
     }
 
-    public void broadcastToClients(String data) {
+    // send the object parameter (String or String[]) to all clients 
+    public void broadcastToClients(Object data) {
         for (int i = 0; i < Server.allClients.length; i++) {
             if (Server.allClients[i] == null)
                 continue;
             try {
-                Server.allClients[i].oStream.writeChars(data);
+                //Server.allClients[i].oStream.writeChars(data);
+                Server.allClients[i].oStream.writeObject(data);
             } catch (Exception e) {
-                System.out.println("ERROR: writing to server: " + i);
+                System.err.println("ERROR: writing to server: " + i);
             }
         }
-    }
+    }    
 }

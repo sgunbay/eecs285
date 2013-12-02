@@ -17,9 +17,9 @@ import javax.swing.SwingConstants;
 
 public class GetNameDialog extends JDialog {
 
-  JTextField inputField;
-  JButton okButton;
-  private static final long serialVersionUID = 1L;
+    JTextField inputField;
+    JButton okButton;
+    private static final long serialVersionUID = 1L;
 
     public GetNameDialog(JFrame mainFrame) {
         super(mainFrame, "", true);
@@ -59,34 +59,16 @@ public class GetNameDialog extends JDialog {
             if (e.getSource() == okButton) {
                 // only close window if user has entered a name
                 if (getInput().compareTo("") != 0) {
-                    
-                    //if(nameTaken(getInput())) {
-                    //    System.out.println("NAME ALREADY TAKEN");
-                    //    // don't let player choose this name again
-                    //}                        
-                    
                     // Send name to server
                     try {
                         Siege.sendToServer("NAME: " + getInput());
-                        System.out.println("Name sending to server...");
+                        System.out.println("Sending player name (" + getInput() + ") to server..");
                     } catch (IOException e1) {
                         System.out.println("ERROR: SENDING NAME TO SERVER");
                     }
                     setVisible(false);
                 }
             }
-        }
-
-        private boolean nameTaken(String input) {
-            String[] temp = Server.playerNames;
-            System.out.println("In nameTaken");
-            for(int i = 0; i < 4; i++) {
-                System.out.println("input: " + input);
-                System.out.println("i = " + i + ": " + temp[i]);
-                if(temp[i].contentEquals(input))
-                    return true;
-            }            
-            return false;
         }
     }
 

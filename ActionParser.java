@@ -1,9 +1,18 @@
 package com.eecs285.siegegame;
 
 public class ActionParser {
+    
+    private String input;
+    
+    ActionParser(String in) {
+        input = in;
+        //for(int i = 0; i < input.length(); i++)
+        //    System.out.println("i = " + i + ": " + input.charAt(i));
+    }
 
     public static enum ActionType {
-        ATTACK,
+        ATTACK_ARMY,
+        ATTACK_CITY,
         RECRUIT,
         LOSE_UNITS,
         MOVE_ARMY,
@@ -20,11 +29,14 @@ public class ActionParser {
         NAME_CHANGE
     }
 
-    static ActionType getActionType(String input) {
+    ActionType getActionType() {
         // returns the action type present in the input string
-        // Army ActionTypes
-        if (input.contains("attacks"))
-            return ActionType.ATTACK;
+        // Army ActionTypes        
+        
+        if (input.contains("attacks") && input.contains("army"))
+            return ActionType.ATTACK_ARMY;
+        else if (input.contains("attacks") && input.contains("city"))
+            return ActionType.ATTACK_CITY;
         else if (input.contains("trained"))
             return ActionType.RECRUIT;
         else if (input.contains("loses units"))
@@ -63,7 +75,7 @@ public class ActionParser {
         return null;
     }
 
-    static Coord getFirstCoordinate(String input) {
+    Coord getFirstCoordinate() {
         // returns the first set of coordinates in the input string
 
         // if string doesn't contain parentheses, return null
@@ -89,11 +101,11 @@ public class ActionParser {
 
         int row = Integer.parseInt(coords[0]);
         int col = Integer.parseInt(coords[1]);
-
+        
         return (new Coord(row, col));
     }
 
-    static Coord getSecondCoordinate(String input) {
+    Coord getSecondCoordinate() {
         // returns the second set of coordinates from input, or null
         // if there is only 1 pair
 
@@ -102,6 +114,44 @@ public class ActionParser {
         input = input.substring(endFirstCoord + 1);
 
         // use getFirstCoordinate function to get the remaining coordinates
-        return getFirstCoordinate(input);
+        return getFirstCoordinate();
+    }
+    
+    Player getFirstPlayer() {
+        // This player's name is always at beginning of string
+        String[] words = input.split(" ");
+        String pName = words[0];
+        
+        // if string contains "Player's" instead of "Player", remove the 's
+        int nameLength = words[0].length();
+        if(words[0].charAt(nameLength - 2) == '\'') //need to escape ' mark
+            words[0] = words[0].substring(0, nameLength - 2);
+        
+        
+        System.out.println("in getFirstPlayer");
+        for(int i = 0; i < Server.MAX_PLAYERS; i++) {
+            if(Siege.players[i] != null && Siege.players[i].name == pName)
+                 return Siege.players[i];
+        }
+        return null;
     }
 }
+
+
+
+/*
+Narration mode
+Start game
+Announce player, turn #
+Player trained unit in city coord (x, y)
+Player moved army from coord (x1, y1) to (x2, y2)
+Player merged army at coord (x1, y1) with (x2, y2)
+Player's army at (x1, y1) attacks player's army/city at (x2, y2)
+Player's army loses units
+Player captures resource/city at coord (x, y)
+Player's city at coord (x, y) is under siege/liberated
+Player's resource at coord (x, y) is under conflict/recaptured
+Player is defeated
+Player wins
+Player ends turn
+*/
