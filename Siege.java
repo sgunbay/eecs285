@@ -158,6 +158,7 @@ public class Siege {
                 mainFrame.printNarration(playerNames[currentPlayer]
                         + " trains " + count + " " + unitType
                         + " unit(s) at city " + city);
+                mainFrame.printNonePanel();
                 break;
             case RESOURCE_RECAPTURED:
                 System.out.println("Recapture Resource");

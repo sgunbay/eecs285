@@ -169,6 +169,8 @@ public class MainGameFrame extends JFrame {
         gridSquares[i][j].setLayout(overlay);
         gridSquares[i][j].setBackground(stringToColor(Siege.grid.getTile(
               new Coord(i, j)).getColor()));
+        if (Siege.grid.getTile(new Coord(i, j)).isResource())
+          gridSquares[i][j].setBackground(stringToColor(guessResourceBackground(Siege.grid.getTile(new Coord(i, j)))));
         gridSquares[i][j].addMouseListener(gridSquareMouseListener);
         gridSquares[i][j]
             .setPreferredSize(new Dimension(SQUARESIZE, SQUARESIZE));
@@ -773,6 +775,10 @@ public class MainGameFrame extends JFrame {
             } else {
               gridSquares[i][j].setBackground(stringToColor(Siege.grid.getTile(
                   new Coord(i, j)).getColor()));
+              if (Siege.grid.getTile(new Coord(i, j)).isResource())
+                gridSquares[i][j]
+                    .setBackground(stringToColor(guessResourceBackground(Siege.grid
+                        .getTile(new Coord(i, j)))));
             }
           }
         }
@@ -1003,7 +1009,6 @@ public class MainGameFrame extends JFrame {
         + Siege.players[Siege.currentPlayer].getGold());
     currentIncome.setText("Current Income: $"
         + Siege.players[Siege.currentPlayer].getIncome());
-    endTurnButton.setEnabled(true);
   }
 
   void printUnoccupiedCityPanel(Tile noneTile) {
@@ -1113,9 +1118,11 @@ public class MainGameFrame extends JFrame {
     if (!Siege.players[Siege.currentPlayer].name.equalsIgnoreCase(name)) {
       HUDLayout.show(HUDTopPanel, "Lock");
       currentHUDCard = "Lock";
+      endTurnButton.setEnabled(false);
     } else {
       HUDLayout.show(HUDTopPanel, "None");
       currentHUDCard = "None";
+      endTurnButton.setEnabled(true);
     }
   }
 
