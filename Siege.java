@@ -1,7 +1,6 @@
 package com.eecs285.siegegame;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.Random;
@@ -34,13 +33,10 @@ public class Siege {
         final int rows = 25;
         final int cols = 40;
 
-        Tile[][] mapTiles = new Tile[rows][cols];
-        for (int i = 0; i < rows; i++)
-            for (int j = 0; j < cols; j++)
-                mapTiles[i][j] = new TilePlains(new Coord(i, j));
+        grid = new Grid(rows, cols);
+        grid.initialize();
 
-        MainGameFrame mainFrame = new MainGameFrame("Siege", rows, cols,
-                mapTiles);
+        MainGameFrame mainFrame = new MainGameFrame(grid);
         mainFrame.printNarration("Jordan added a bit of functionality");
         mainFrame.printNarration("Jordan tested the functionality");
         mainFrame.printNarration("Jordan is making sure the scrollbar works");
@@ -191,7 +187,7 @@ public class Siege {
         in = new ObjectInputStream(cSocket.getInputStream());
     }
 
-    public static void sendToServer(String data) throws IOException {
+    public static void sendToServer(String data) throws Exception {
         // send the string parameter to the server
         data += '\n';
         out.writeChars(data);
