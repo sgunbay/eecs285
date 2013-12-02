@@ -53,7 +53,6 @@ public class Siege {
         final int cols = grid.cols;
        
         mainFrame = new MainGameFrame(grid);
-
         
         //get player names array from server
         playerNames = (String[]) in.readObject();
@@ -62,11 +61,10 @@ public class Siege {
         numPlayers = playerNames.length;
         players = new Player[numPlayers];
         for(int i = 0; i < playerNames.length; i++)
-            players[i] = new Player(i,playerNames[i]);       
+            players[i] = new Player(i,playerNames[i]); 
         
         while (true) {
             // Get string from server
-            // String fromServer = in.readLine();
             String fromServer = (String) in.readObject();
             fromServer = Siege.parseServerString(fromServer);
             System.out.println("FROM SERVER: " + fromServer);
@@ -152,7 +150,8 @@ public class Siege {
             		count += attemptTrain(t,unitType);
             	
             	grid.setTile(city,t);
-            	mainFrame.updateGridSquare(city);
+            	mainFrame.updateGridSquare(city);            	
+            	mainFrame.gridSquareMouseListener.simulateMouseEntered();      	
             	mainFrame.printNarration(playerNames[currentPlayer] + " trains " + count + " " + unitType + " unit(s) at city " + city);
                 break;
             case RESOURCE_RECAPTURED:
