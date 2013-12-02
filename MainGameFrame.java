@@ -777,14 +777,7 @@ public class MainGameFrame extends JFrame {
                 gridSquares[x.row][x.col]
                     .setBackground(gridSquares[x.row][x.col].getBackground()
                         .brighter());
-              }
-            }
-            if (mapTiles.getTile(new Coord(i, j)).getOccupant() != null
-                && mapTiles.getTile(new Coord(i, j)).getOccupant().owner != -1) {
-              for (Coord x : currentTile.getOccupant().possibleInfluences) {
-                gridSquares[x.row][x.col]
-                    .setBackground(gridSquares[x.row][x.col].getBackground()
-                        .brighter());
+                System.out.println(x + " is influenced");
               }
             }
           }
