@@ -574,8 +574,6 @@ public class MainGameFrame extends JFrame {
         } else
           System.out.println("Nothing selected");
         trainingButtons_CITY.clearSelection();
-        printMyCityPanel(currentSelected);
-        updateGridSquare(currentSelected.coord);
         // Player trains 50 Basic unit(s) at city (r, c)
       }
     }
