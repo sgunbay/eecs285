@@ -22,7 +22,7 @@ public class Siege {
     static DataOutputStream out;
     static ObjectInputStream in;
     static int portNum = 45000;
-    private final static String IPaddress = "127.0.0.1"; // server IP
+    private final static String IPaddress = "67.194.55.95"; // server IP
     
     
 
@@ -207,7 +207,8 @@ public class Siege {
         for (int i = 0; i < input.length(); i++) {
             if (Character.isLetterOrDigit(input.charAt(i))
                     || input.charAt(i) == ' ' || input.charAt(i) == '('
-                    || input.charAt(i) == ')' || input.charAt(i) == ',')
+                    || input.charAt(i) == ')' || input.charAt(i) == ','
+                    || input.charAt(i) == '.' || input.charAt(i) == '!');
                 temp += input.charAt(i);
         }
         return temp;
