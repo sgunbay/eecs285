@@ -2,7 +2,6 @@ package com.eecs285.siegegame;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -34,9 +33,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
+//The main game frame of Siege
 public class MainGameFrame extends JFrame {
 
   private static final long serialVersionUID = 1L;
@@ -124,12 +123,12 @@ public class MainGameFrame extends JFrame {
   JLabel resourceBonus;
 
   public MainGameFrame(Grid grid) throws Exception {
-    //initilaize Siege automatically
+    // initilaize Siege automatically
     super("Siege");
     ImageIcon icon = new ImageIcon("src/Resources/castleIcon3.png");
     setIconImage(icon.getImage());
-    
-    //Initilaize all constants
+
+    // Initilaize all constants
     ROWS = grid.rows;
     COLS = grid.cols;
 
@@ -138,7 +137,7 @@ public class MainGameFrame extends JFrame {
     ATTACKER_COST = new UnitAttacker().cost;
     RUSHER_COST = new UnitRusher().cost;
 
-    //Figure out optimal window size
+    // Figure out optimal window size
     TASKBAR_HEIGHT = Toolkit.getDefaultToolkit().getScreenInsets(
         getGraphicsConfiguration()).bottom;
     SCREEN_HEIGHT = (int) GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -163,7 +162,7 @@ public class MainGameFrame extends JFrame {
       currentNames.add(name);
     }
 
-    //initialize gridSquares
+    // initialize gridSquares
     gridSquares = new JPanel[ROWS][COLS];
 
     for (int i = 0; i < ROWS; i++) {
@@ -331,7 +330,8 @@ public class MainGameFrame extends JFrame {
     pressRusherIcon = new ImageIcon("src/Resources/pressRusherIcon.png");
     strengthLabelMyCity = new JLabel("Occupying army strength: ???",
         JLabel.CENTER);
-    numberOfUnitsLabelMyCity = new JLabel("Number of units: ???", JLabel.CENTER);
+    numberOfUnitsLabelMyCity = new JLabel("Number of units: ???",
+        JLabel.CENTER);
 
     numBasicMyCity = new JLabel(": ???");
     numAttackerMyCity = new JLabel(": ???");
@@ -350,7 +350,8 @@ public class MainGameFrame extends JFrame {
     myCityArmyPanel.add(new JLabel(rusherIconMyCity));
     myCityArmyPanel.add(numRusherMyCity);
 
-    TrainingTextMouseListener trainingTextMouseListener = new TrainingTextMouseListener();
+    TrainingTextMouseListener trainingTextMouseListener
+      = new TrainingTextMouseListener();
 
     trainNumberOfUnits = new JTextField();
     trainNumberOfUnits.setPreferredSize(new Dimension(30, 20));
@@ -524,7 +525,7 @@ public class MainGameFrame extends JFrame {
     }
   }
 
-  //Tell server that info is ready
+  // Tell server that info is ready
   public class ReadyButtonListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
       readyButton.setEnabled(false);
@@ -540,27 +541,28 @@ public class MainGameFrame extends JFrame {
     }
   }
 
-  
   public class UnitButtonListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
       Tile relevant = currentSelected;
       if (e.getSource() == basicRadioBut_CITY) {
         System.out.println("Clicked on basic unit button");
-        trainingButton.setText(getPriceOf(BASIC_COST));// price of basic * num
+        trainingButton.setText(getPriceOf(BASIC_COST));
+        // price of basic * num
       }
       if (e.getSource() == attackerRadioBut_CITY) {
         System.out.println("Clicked on attacker unit button");
-        trainingButton.setText(getPriceOf(ATTACKER_COST));// price of attacker *
-                                                          // num
+        trainingButton.setText(getPriceOf(ATTACKER_COST));
+        // price of attacker *num
       }
       if (e.getSource() == explorerRadioBut_CITY) {
         System.out.println("Clicked on explorer unit button");
-        trainingButton.setText(getPriceOf(EXPLORER_COST));// price of explorer *
-                                                          // num
+        trainingButton.setText(getPriceOf(EXPLORER_COST));
+        //price of explorer*num
       }
       if (e.getSource() == rusherRadioBut_CITY) {
         System.out.println("Clicked on rusher unit button");
-        trainingButton.setText(getPriceOf(RUSHER_COST));// price of rusher * num
+        trainingButton.setText(getPriceOf(RUSHER_COST));
+        //price of rusher*num
       }
       if (e.getSource() == trainingButton) {
         if (basicRadioBut_CITY.isSelected()) {
@@ -604,7 +606,7 @@ public class MainGameFrame extends JFrame {
     }
   }
 
-  //GUI Click/Enter/Exit functionality
+  // GUI Click/Enter/Exit functionality
   public class GridSquareMouseListener extends MouseAdapter {
     public void mouseClicked(MouseEvent e) {
       if (currentSelected != null && currentSelected.getOccupant() != null) {
@@ -612,15 +614,17 @@ public class MainGameFrame extends JFrame {
           undoOutlineSquare(x);
         }
       }
+      // the player's ID from server
       int id = 0;
       for (Player play : Siege.players) {
         if (play.name.equalsIgnoreCase(name))
           id = play.id;
       }
+      // Find the panel (i, j)
       for (Integer i = 0; i < ROWS; i++) {
         for (Integer j = 0; j < COLS; j++) {
           if (e.getSource().equals(gridSquares[i][j])) {
-            if (currentSelected == null) {
+            if (currentSelected == null) {// no previous selected
               if (Siege.grid.getTile(new Coord(i, j)).isCity()
                   && Siege.grid.getTile(new Coord(i, j)).owner == id) {
                 currentSelected = Siege.grid.getTile(new Coord(i, j));
@@ -630,7 +634,8 @@ public class MainGameFrame extends JFrame {
                 cityMainLayout.show(HUDCitySelectMainPanel, "my");
 
               } else if (Siege.grid.getTile(new Coord(i, j)).getOccupant() != null
-                  && Siege.grid.getTile(new Coord(i, j)).getOccupant().owner == id) {
+                  && Siege.grid.getTile(new Coord(i, j))
+                  .getOccupant().owner == id) {
                 currentSelected = Siege.grid.getTile(new Coord(i, j));
                 printArmyPanel(currentSelected);
                 HUDLayout.show(HUDTopPanel, "Army");
@@ -641,13 +646,14 @@ public class MainGameFrame extends JFrame {
                 HUDLayout.show(HUDTopPanel, "None");
                 currentHUDCard = "None";
               }
-            } else {
+            } else {// previously selected an army or a city
               System.out.println(currentSelected);
               if (currentSelected.getOccupant() != null
                   && id == Siege.currentPlayer) {
 
                 System.out.println(currentSelected.getOccupant());
                 for (Coord x : currentSelected.getOccupant().possibleMoves) {
+                  // try move
                   if (i == x.row && j == x.col) {
                     if (Siege.grid.getTile(x).getOccupant() == null) {
                       try {
@@ -657,8 +663,9 @@ public class MainGameFrame extends JFrame {
                         System.exit(-1);
                       }
                     }
-                    if (Siege.players[Siege.grid.getTile(x).getOccupant().owner].name
-                        .equals(name)) {
+                    if (Siege.players[Siege.grid.getTile(x)
+                      .getOccupant().owner].name.equals(name)) {
+                      // try merge
                       try {
                         Siege.sendToServer(name + " merged army at "
                             + currentSelected.coord + " with " + x);
@@ -745,14 +752,6 @@ public class MainGameFrame extends JFrame {
                         .brighter());
               }
             }
-            /*
-             * if (mapTiles.getTile(new Coord(i, j)).getOccupant() != null &&
-             * mapTiles.getTile(new Coord(i, j)).getOccupant().owner != -1) {
-             * for (Coord x : currentTile.getOccupant().possibleInfluences) {
-             * gridSquares[x.row][x.col]
-             * .setBackground(gridSquares[x.row][x.col].getBackground()
-             * .brighter()); } }
-             */
           }
         }
       }
@@ -775,8 +774,8 @@ public class MainGameFrame extends JFrame {
                           .getColor()));
                 } else {
                   gridSquares[x.row][x.col]
-                      .setBackground(stringToColor(guessResourceBackground(Siege.grid
-                          .getTile(x))));
+                      .setBackground(stringToColor(guessResourceBackground
+                          (Siege.grid.getTile(x))));
                 }
               }
 
@@ -785,8 +784,8 @@ public class MainGameFrame extends JFrame {
                   new Coord(i, j)).getColor()));
               if (Siege.grid.getTile(new Coord(i, j)).isResource())
                 gridSquares[i][j]
-                    .setBackground(stringToColor(guessResourceBackground(Siege.grid
-                        .getTile(new Coord(i, j)))));
+                    .setBackground(stringToColor(guessResourceBackground
+                        (Siege.grid.getTile(new Coord(i, j)))));
             }
           }
         }
@@ -801,6 +800,7 @@ public class MainGameFrame extends JFrame {
         .getLength());
   }
 
+  // make sure GridSquares matches the grid in Siege
   void updateGridSquare(Coord pos) throws Exception {
     if (gridSquares[pos.row][pos.col].getComponentCount() != 0) {
       gridSquares[pos.row][pos.col].removeAll();
@@ -855,6 +855,7 @@ public class MainGameFrame extends JFrame {
     return;
   }
 
+  // finds the correct background color
   void setBackgroundOfGridSquare(Tile in) {
     String color = in.getColor();
     if (in.isCity() || in.isResource())
@@ -878,17 +879,20 @@ public class MainGameFrame extends JFrame {
     }
   }
 
+  // finds the path to image file
   String getPathTo(String playerColor, String tileType) {
     String path = playerToColor(playerColor);
     return "src/resources/" + path + tileType + ".png";
   }
 
+  // updates all grid squares
   void updateAllGridSquares() throws Exception {
     for (int i = 0; i < ROWS; i++)
       for (int j = 0; j < COLS; j++)
         updateGridSquare(new Coord(i, j));
   }
 
+  // shrink image down to preferred square size
   BufferedImage resizeImage(int size, BufferedImage img) {
     int w = img.getWidth();
     int h = img.getHeight();
@@ -901,6 +905,7 @@ public class MainGameFrame extends JFrame {
     return dimg;
   }
 
+  // Colors of tiles are not hardcoded in
   Color stringToColor(String in) {
     if (in.equals("plains"))
       return Color.GREEN.darker();
@@ -916,6 +921,7 @@ public class MainGameFrame extends JFrame {
       return null;
   }
 
+  // colors of players are not hardcoded in
   String playerToColor(String in) {
     if (in == null)
       return "white";
@@ -931,10 +937,7 @@ public class MainGameFrame extends JFrame {
       return "white";
   }
 
-  String getPlayerName() {
-    return name;
-  }
-
+  // bold squares
   void outlineAroundSquare(Integer row, Integer col, Integer radius) {
     gridSquares[row][col]
         .setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -956,6 +959,7 @@ public class MainGameFrame extends JFrame {
     }
   }
 
+  // unbold square
   void undoOutlineAroundSquare(Integer row, Integer col, Integer radius) {
     gridSquares[row][col].setBorder(null);
     for (int j = 0; j <= radius; j++) {
@@ -976,6 +980,7 @@ public class MainGameFrame extends JFrame {
     outlineSquare(x.row, x.col);
   }
 
+  // overloaded
   void outlineSquare(Integer row, Integer col) {
     gridSquares[row][col]
         .setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -985,10 +990,12 @@ public class MainGameFrame extends JFrame {
     undoOutlineSquare(x.row, x.col);
   }
 
+  // overloaded
   void undoOutlineSquare(Integer row, Integer col) {
     gridSquares[row][col].setBorder(null);
   }
 
+  // calculates how much units cost
   String getPriceOf(int cost) {
     String amt = trainNumberOfUnits.getText();
     int num = 0;
@@ -1014,6 +1021,7 @@ public class MainGameFrame extends JFrame {
     return "$" + toReturn.toString();
   }
 
+  // updates panel
   void printNonePanel() {
     int i = 0;
     for (Player play : Siege.players) {
@@ -1024,10 +1032,12 @@ public class MainGameFrame extends JFrame {
     currentIncome.setText("Current Income: $" + Siege.players[i].getIncome());
   }
 
+  // updates panel
   void printUnoccupiedCityPanel(Tile noneTile) {
     cityStatus_CITY.setText("City is unoccupied");
   }
 
+  // updates panel
   void printMyCityPanel(Tile cityTile) {
     String owner = Siege.players[cityTile.owner].name;
     if (cityTile.infers != 0)
@@ -1055,6 +1065,7 @@ public class MainGameFrame extends JFrame {
     numRusherMyCity.setText(r.toString());
   }
 
+  // update panel
   void printEnemyCityPanel(Tile cityTile) {
     String owner = Siege.players[cityTile.owner].name;
     if (cityTile.infers != 0)
@@ -1081,6 +1092,7 @@ public class MainGameFrame extends JFrame {
     numRusherEnemyCity.setText(r.toString());
   }
 
+  // update army panel
   void printArmyPanel(Tile armyTile) {
     System.out.println(armyTile.owner);
     armyOwner_ARMY.setText(Siege.players[armyTile.getOccupant().owner].name
@@ -1106,6 +1118,7 @@ public class MainGameFrame extends JFrame {
     numRusher_ARMY.setText(r.toString());
   }
 
+  // update resource panel
   void printResourcePanel(Tile resourceTile) {
     if (resourceTile.owner == -1)
       resourceState.setText("Resource is under conflict");
@@ -1115,6 +1128,7 @@ public class MainGameFrame extends JFrame {
     resourceBonus.setText("Resource adds " + resourceTile.income + "income");
   }
 
+  // update locked panel
   void printLockedPanel() {
     HUDLockedPanel.add(new JLabel("Currently "
         + Siege.players[Siege.currentPlayer].name + "'s turn", JLabel.CENTER),
