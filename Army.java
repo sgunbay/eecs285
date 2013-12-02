@@ -207,6 +207,12 @@ public class Army{
 		return true;
 	}
 
+	private int dist(Coord a, Coord b){
+		int rowdist = Math.max(a.row - b.row, b.row - a.row);
+		int coldist = Math.max(a.col - b.col, b.col - a.col);
+		return rowdist + coldist;	
+	}
+	
 	private void updatePossibleInfluences(){
 		
 		possibleInfluences = new Vector<Coord>();
@@ -217,10 +223,10 @@ public class Army{
 		double range = spd * Siege.grid.getTile(coord).getSpdFactor();
 		int r = (int) range;
 		
-		for (int i = coord.row-r; i < coord.row+r; ++i){
-			for (int j = coord.col-r; j < coord.col+r; ++j){
+		for (int i = coord.row-r; i <= coord.row+r; ++i){
+			for (int j = coord.col-r; j <= coord.col+r; ++j){
 				Coord c = new Coord(i,j);
-				if (Siege.grid.withinBounds(c))
+				if (Siege.grid.withinBounds(c) && (dist(c,coord) <= r))
 					possibleInfluences.add(c);
 			}
 		}

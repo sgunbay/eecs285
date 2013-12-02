@@ -121,6 +121,8 @@ public class Siege {
             case END_TURN:
                 mainFrame.printNarration(players[currentPlayer].name + " ends turn.");
                 players[currentPlayer].endTurn();
+                mainFrame.updateAllGridSquares();
+                mainFrame.updatePlayer();
                 break;
             case LOSE_UNITS:
                 System.out.println("Lose Units");
@@ -135,6 +137,8 @@ public class Siege {
             		mainFrame.printNarration(fromServer);
             	else
             		System.out.println("Invalid move attempted.");
+            	mainFrame.updateGridSquare(me);
+            	mainFrame.updateGridSquare(victim);
             	
                 break;
             case RECRUIT:
