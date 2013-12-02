@@ -25,7 +25,7 @@ public class Siege {
     static DataOutputStream out;
     static ObjectInputStream in;
     static int portNum = 45000;
-    private final static String IPaddress = "67.194.55.95"; // server IP
+    private final static String IPaddress = "127.0.0.1"; // server IP
 
     public static int attemptTrain(Tile city, String unitType) {
         if (unitType.equalsIgnoreCase("Basic") && city.trainUnitBasic())
@@ -153,7 +153,8 @@ public class Siege {
 
                 grid.setTile(city, t);
                 mainFrame.updateGridSquare(city);
-                mainFrame.gridSquareMouseListener.simulateMouseEntered();
+                try{mainFrame.gridSquareMouseListener.simulateMouseEntered();}
+                catch (Exception e){}
                 mainFrame.printNarration(playerNames[currentPlayer]
                         + " trains " + count + " " + unitType
                         + " unit(s) at city " + city);

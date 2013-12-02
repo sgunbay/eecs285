@@ -704,7 +704,7 @@ public class MainGameFrame extends JFrame {
           gridSquares[i][j].setBackground(gridSquares[i][j].getBackground());
           currentPositionLabel.setText("(Row: " + i + " Col: " + j + ")");
 
-          if (currentTile.owner != -1) {
+          if (currentTile.getOccupant() != null && currentTile.owner != -1) {
             for (Coord x : currentTile.getOccupant().possibleInfluences) {
               gridSquares[x.row][x.col].setBackground(gridSquares[x.row][x.col]
                   .getBackground());
@@ -733,7 +733,6 @@ public class MainGameFrame extends JFrame {
                 gridSquares[x.row][x.col]
                     .setBackground(gridSquares[x.row][x.col].getBackground()
                         .brighter());
-                System.out.println(x + " is influenced");
               }
             }
             /*
