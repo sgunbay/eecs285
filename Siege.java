@@ -157,6 +157,15 @@ public class Siege {
             case NAME_CHANGE:
                 System.out.println("Name change occured");
                 break;
+            case WAITING_FOR_PLAYERS:
+                System.out.println("Waiting for players...");
+                break;
+            case STARTING_GAME:
+                System.out.println("Starting game");
+                break;
+            case IS_READY:
+                System.out.println("Is ready");
+                break;
             default:
                 System.out
                         .println("ERROR: Action did not specify a known ActionType");

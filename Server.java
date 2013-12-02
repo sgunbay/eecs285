@@ -56,11 +56,17 @@ public class Server {
         System.out.println("CONNECTIONS NOT ALLOWED");        
 
         // Delay sending of names array until all players have chosen
-        while (!(chosen[0] && chosen[1] && chosen[2] && chosen[3]))
+        boolean allChosen = false;        
+        while (!allChosen){
+            allChosen = true;
+            for (int i = 0; i < MAX_PLAYERS; ++i){
+                if (!chosen[i])
+                    allChosen = false;
+            }            
             try {
                 Thread.sleep(500);
-            } catch (InterruptedException e) {
-            }
+            } catch (InterruptedException e) {}
+        }
         
         // send player names to clients (using first client's output stream)
         System.out.println("Sending playerNames[] to all clients...");
