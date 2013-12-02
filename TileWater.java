@@ -2,6 +2,8 @@ package com.eecs285.siegegame;
 
 public class TileWater extends Tile {
 
+	// Water tile. Impassable terrain.
+	
 	TileWater(Coord in_coord){
 		super("water",false,in_coord);
 	}

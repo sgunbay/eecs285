@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.Random;
+import javax.swing.*;
 
 import com.eecs285.siegegame.ActionParser.ActionType;
 
@@ -25,7 +26,7 @@ public class Siege {
     static DataOutputStream out;
     static ObjectInputStream in;
     static int portNum = 45000;
-    private final static String IPaddress = "67.194.2.78"; // server IP
+    private static final String IPaddress = "67.194.2.78"; // server IP
 
     public static int attemptTrain(Tile city, String unitType) {
         if (unitType.equalsIgnoreCase("Basic") && city.trainUnitBasic())
@@ -42,6 +43,25 @@ public class Siege {
             return 0;
     }
 
+    public static boolean endGame(){
+    // Check if a player has won.
+    	int count[] = new int[numPlayers];
+    	for (int i = 0; i < grid.rows; ++i){
+    		for (int j = 0 ; j < grid.cols; ++j){
+    			if (grid.getTile(new Coord(i,j)).isCity() && grid.getTile(new Coord(i,j)).owner != -1)
+    				count[grid.getTile(new Coord(i,j)).owner]++;
+    		}
+    	}
+    	int wincount = 0;
+    	for (int i = 0; i < numPlayers; ++i){
+    		if (count[i] == 0)
+    			wincount++;
+    	}
+    	if (wincount >= numPlayers - 1)
+    		return true;
+    	return false; 	
+    }
+    
     public static void main(String args[]) throws Exception {
         // initialize connection to server (including IO streams)
         initServerConnection();
@@ -97,6 +117,7 @@ public class Siege {
             case CAPTURE_CITY:
             case MERGE_ARMY:
             case MOVE_ARMY:
+            // Move army.
                 Coord me = parser.getFirstCoordinate();
                 Coord victim = parser.getSecondCoordinate();
                 if (grid.getOccupantAt(me).attemptMove(victim))
@@ -137,11 +158,15 @@ public class Siege {
                 }
                 mainFrame.updatePlayer();
                 mainFrame.printNonePanel();
+                if (endGame()){
+                	JOptionPane.showMessageDialog(mainFrame,"Game over!","Game Over",JOptionPane.INFORMATION_MESSAGE);
+                }
                 break;
             case LOSE_UNITS:
                 System.out.println("Lose Units");
                 break;
             case RECRUIT:
+            	// Recruit units in city.
                 city = parser.getFirstCoordinate();
                 int numUnits = parser.getNumUnits();
                 String unitType = parser.getTypeUnits();
@@ -181,6 +206,7 @@ public class Siege {
                 System.out.println("Waiting for players...");
                 break;
             case STARTING_GAME:
+            	// Initialize the game.
                 System.out.println("Starting game...");
                 for (int i = 0; i < numPlayers; ++i)
                     players[i].endTurn();
@@ -198,7 +224,7 @@ public class Siege {
                 }
                 mainFrame.printNonePanel();
                 mainFrame.updatePlayer();
-
+                
                 break;
             default:
                 System.out.println("ERROR: Action did not specify"
@@ -210,6 +236,7 @@ public class Siege {
     }
 
     private static void printInfo(MainGameFrame mainFrame, String[] names) {
+    // Print all preliminary information.
         String[] colors = {"Red", "Blue", "Green", "Yellow"};     
 
         mainFrame.printNarration("Some basic information:");        

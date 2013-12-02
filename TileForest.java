@@ -1,7 +1,7 @@
 package com.eecs285.siegegame;
 
 public class TileForest extends Tile {
-	
+	// Forest tile. Slows movement by a small amount.
 	TileForest(Coord in_coord){
 		super("forest",true,in_coord);
 	}

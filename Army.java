@@ -5,18 +5,19 @@ import java.util.*;
 public class Army{
 	
 	public static int MAX_ARMY_SIZE = 100;
-	public static double RECOIL = 0.3;
+	public static double RECOIL = 0.5;
 	
-	public int owner;
-	public Coord coord;
-	public Double dmg;
-	public Double spd;
-	public Queue<Unit> units;
-	public Vector<Coord> possibleMoves;
-	public Vector<Coord> possibleInfluences;
+	public int owner; // Player that owns army.
+	public Coord coord; // Coordinates of army.
+	public Double dmg; // Total damage.
+	public Double spd; // Army speed.
+	public Queue<Unit> units; // Vector of units in the army.
+	public Vector<Coord> possibleMoves; // Vector of all possible coordinates to which we can move.
+	public Vector<Coord> possibleInfluences; // Vector of all possible coordinates we influence.
 	
 	
 	Army(int in_owner, Coord in_coord){
+	// Constructor.
 		owner = in_owner;
 		units = new ArrayDeque<Unit>();
 		dmg = new Double(0);
@@ -27,6 +28,7 @@ public class Army{
 	}
 
 	public String getColor(){
+	// Reutrns a string representing player color.
 		return "player" + owner + "color";
 	}
 	
@@ -39,6 +41,7 @@ public class Army{
 	}
 	
 	public Boolean addUnit(Unit u){
+	// Adds a unit to the army.
 		if (isFull())
 			return false;
 		units.add(u);
@@ -48,7 +51,7 @@ public class Army{
 	}
 	
 	private Unit removeUnit(){
-		
+	// Unconditionally kills off a unit.	
 		assert(!isEmpty());
 		Unit u = units.remove();
 		dmg -= u.dmg;
@@ -63,6 +66,7 @@ public class Army{
 	}
 	
 	private Unit removeUnit(double probability){
+	// Kills off a unit from the army with a certain probability.
 		assert(probability >= 0);
 		if (Siege.rnd.nextDouble() <= probability)
 			return removeUnit();
@@ -70,6 +74,7 @@ public class Army{
 	}
 	
 	private Army mergeTo(Army a){
+	// Merges two armies together.
 		while (!isEmpty() && !a.isFull())
 			a.addUnit(removeUnit());	
 		a.possibleMoves = new Vector<Coord>();
@@ -77,6 +82,7 @@ public class Army{
 	}
 
 	public int getStrength(){
+		// Returns a value representing the strength of the army.
 		return (int) Math.ceil(Math.sqrt(dmg*(units.size())));
 	}	
 	
@@ -116,13 +122,16 @@ public class Army{
 	public Vector<Coord> updatePossibleMoves(){
 	// Returns a vector of all possible coords that this army can move to.
 		
+		// Set up the range.
 		double range = spd * Siege.grid.getTile(coord).getSpdFactor();
 		int r = (int) range;
 		Vector<Coord> moves = new Vector<Coord>();
 		
+		// Dummy armies can't move.
 		if (units.size() == 0)
 			return moves;
 		
+		// Inner class for the pathfinder's.
 		class PCoord{
 			Coord coord;
 			public int range;
@@ -137,6 +146,7 @@ public class Army{
 		Queue<PCoord> possible = new ArrayDeque<PCoord>();
 		possible.add(init);
 		
+		// Pathfinder algorithm for detecting all possible movements within range.
 		while (!possible.isEmpty()){
 			PCoord c = possible.remove();
 			if (c.range == 0)
@@ -161,6 +171,8 @@ public class Army{
 	
 	private void move(Coord target){
 		
+		// Force moves the army to target.
+		// Updates the grid.
 		Tile mytile = Siege.grid.getTile(coord);
 		Tile victimTile = Siege.grid.getTile(target);
 		
@@ -189,19 +201,19 @@ public class Army{
 		
 		Army victim = Siege.grid.getOccupantAt(target);
 		if (victim != null){
-			if (victim.owner != owner)
-				Siege.grid.setOccupantAt(target,attack(victim));	
-			else
+			if (victim.owner != owner) // Attack if target has an enemy army.
+				Siege.grid.setOccupantAt(target,attack(victim));
+			else // Merge if target has an allied army.
 				Siege.grid.setOccupantAt(target,mergeTo(victim));
 		}
 		
-		if (isEmpty()){
+		if (isEmpty()){ // Delete yourself from grid if you got destroyed by merge / attack recoil.
 			if (Siege.grid.getTile(coord).isCity())
 				Siege.grid.setOccupantAt(coord, new Army(owner, coord));
 			else
 				Siege.grid.setOccupantAt(coord,null);
 		}
-		else if (Siege.grid.getOccupantAt(target) == null)
+		else if (Siege.grid.getOccupantAt(target) == null) // Force move otherwise.
 			move(target);
 		
 		// Update yourself.
@@ -212,21 +224,25 @@ public class Army{
 	}
 
 	private int dist(Coord a, Coord b){
+	// Calculate distance between two coordinates.
 		int rowdist = Math.max(a.row - b.row, b.row - a.row);
 		int coldist = Math.max(a.col - b.col, b.col - a.col);
 		return rowdist + coldist;	
 	}
 	
 	private void updatePossibleInfluences(){
-		
+		// Updates the vector of all squares influenced by this army.
 		possibleInfluences = new Vector<Coord>();
 		
+		// Dummy armies don't influence anything.
 		if (isEmpty())
 			return;
 		
+		// Determine range.
 		double range = spd * Siege.grid.getTile(coord).getSpdFactor();
 		int r = (int) range;
 		
+		// Grab all valid coordinates within range.
 		for (int i = coord.row-r; i <= coord.row+r; ++i){
 			for (int j = coord.col-r; j <= coord.col+r; ++j){
 				Coord c = new Coord(i,j);
@@ -239,23 +255,26 @@ public class Army{
 	}
 	
 	public void updateInfluences(){
+		// Update the "infers" variables of all cities and resources influenced by this army.
+		
 		if (isEmpty())
 			return;
 		
-		updatePossibleInfluences();
+		updatePossibleInfluences(); // Update your influence vector.
 		for (Coord c : possibleInfluences){
 			Tile t = Siege.grid.getTile(c);	
 			
 			if ((t.isCity()) && (t.owner != owner) && (t.owner != -1)){	
-				t.infers++;
+				t.infers++; // Update infers of all hostile cities influenced by you.
 			}	
 			else if (t.isResource() && (t.owner == -1)){
-				if (t.infers == 0)
+				if (t.infers == 0) // Capture neutral resources.
 					t.owner = owner;
-				else
+				else // Influence conflicted resources.
 					t.infers++;
 			}
 			else if (t.isResource() && (t.owner != owner) && (t.owner != -1)){
+			// Cause enemy resources to fall under conflict.
 				t.owner = -1;
 				t.infers++;
 			}
@@ -264,6 +283,7 @@ public class Army{
 	}
 	
 	public void refreshArmy(){
+	// Update influences and possible moves.
 		updateInfluences();
 		if (owner == Siege.currentPlayer)
 			possibleMoves = updatePossibleMoves();

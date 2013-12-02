@@ -13,6 +13,7 @@ public class Grid {
 	private Tile grid[][];
 	
 	public void initialize(){
+		// Initialize everything to Plains.
 		grid = new Tile[rows][cols];
 		for (int i = 0; i < rows; ++i){
 			for (int j = 0; j < cols; ++j){
@@ -22,19 +23,21 @@ public class Grid {
 	}
 	
 	Grid(int size){
+	// A MORE basic constructor.
 		rows = Math.min(size,max_row);
 		cols = Math.min(Math.min(size,max_col),7*rows/3);
 		initialize();
 	}
 	
 	Grid(int row_in, int col_in){
+	// Basic constructor.
 		rows = Math.min(row_in,max_row);
 		cols = Math.min(Math.min(col_in,max_col),7*rows/3);
 		initialize();
 	}
 	
 	public void load(File file) throws Exception{
-
+		// Load from a map file.
 		BufferedReader istream = new BufferedReader(new FileReader(file.getPath()));
 		String s = istream.readLine();
 			
@@ -71,13 +74,13 @@ public class Grid {
 			else if (firstline[0].equalsIgnoreCase("C"))			
 				setTile(new Coord(row,col),new TileCity(Integer.valueOf(firstline[3]),new Coord(row,col)));
 			else
-				System.out.println("Invalid line.");
-				
+				System.out.println("Invalid line.");		
 		}
 				
 	}
 	
 	public void save(File file) throws Exception{
+		// Save to a map file.
 		BufferedWriter ostream = new BufferedWriter(new FileWriter(file.getPath()));
 		int count = 0;
 		for (int i = 0; i < rows; ++i){
@@ -125,6 +128,7 @@ public class Grid {
 	}
 	
 	public String toString(){
+	// Print the entire grid as a string.
 		String s = new String();
 		for (int i = 0; i < rows; ++i){
 			for (int j = 0; j < cols; ++j)

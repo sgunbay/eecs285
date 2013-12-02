@@ -1,7 +1,8 @@
 package com.eecs285.siegegame;
 
 public class UnitAttacker extends Unit{
-
+	// High damage, low speed, moderate cost unit.
+	
 	UnitAttacker() {
 		name = new String("Attacker");
 		dmg = new Double(5*ATTACK);

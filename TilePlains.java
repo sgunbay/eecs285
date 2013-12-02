@@ -1,7 +1,8 @@
 package com.eecs285.siegegame;
 
 public class TilePlains extends Tile {
-	
+
+	// Plains tile. Default movement speed.
 	TilePlains(Coord in_coord){
 		super("plains",true,in_coord);
 	}

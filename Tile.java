@@ -5,7 +5,7 @@ import java.util.*;
 import java.awt.*;
 
 public abstract class Tile {
-	
+	// Abstract base class for all tile types.
 	public final String name;
 	public final boolean isPassable;
 	public final Coord coord;
@@ -13,14 +13,9 @@ public abstract class Tile {
 	public Integer income;
 	public int infers;
 	public Army a;
-	// Plains.
-	// Forest.
-	// Mud.
-	// Mountain.
-	// Water.
-	
-	// City.
+
 	Tile(String in_name, boolean in_passable, Coord in_coord){
+		// Constructor.
 		income = new Integer(0);
 		owner = new Integer(-1);
 		infers = 0;

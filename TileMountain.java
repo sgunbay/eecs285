@@ -2,6 +2,7 @@ package com.eecs285.siegegame;
 
 public class TileMountain extends Tile {
 
+	// Mountain tile. Raises movement speed.
 	TileMountain(Coord in_coord){
 		super("mountain",true,in_coord);
 	}

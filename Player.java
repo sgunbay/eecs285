@@ -5,14 +5,14 @@ import java.util.Random;
 
 public class Player {
 
-	public int id;
-	public Color color;
-	public String name;
+	public int id; // Player number.
+	public String name; // Player name.
 	
-	private Integer gold;
-	private Integer income;
+	private Integer gold; // Player's gold.
+	private Integer income; // Player's income.
 	
 	Player(int id_in, String name_in){
+	// Constructor.
 		name = new String(name_in);
 		id = id_in;
 		gold = new Integer(0);
@@ -20,6 +20,7 @@ public class Player {
 	}
 	
 	public void updateIncome(){
+	// Refresh the income of player.
 		income = 0;
 		for (int i = 0; i < Siege.grid.rows; ++i){
 			for (int j = 0; j < Siege.grid.cols; ++j){
@@ -35,7 +36,7 @@ public class Player {
 	}
 	
 	public void transferAccGold(int accGold){
-		gold += accGold;
+		gold += accGold; // Receive gold from liberated cities.
 	}
 	
 	public int getGold(){
@@ -47,12 +48,12 @@ public class Player {
 	}
 	
 	public void subtractGold(int cost){
-		assert(cost <= gold);
+		assert(cost <= gold); // For deducting unit training costs.
 		gold -= cost;		
 	}
 	
 	public void refreshPlayer(){
-		
+		// Refreshes the player's income and gold, as well as the influence statuses of cities and army movements.
 		for (int i = 0; i < Siege.grid.rows; ++i){
 			for (int j = 0; j < Siege.grid.cols; ++j){
 				Tile target = Siege.grid.getTile(new Coord(i,j));
@@ -76,6 +77,7 @@ public class Player {
 	}
 	
 	public void endTurn(){
+		// Ends player's turn by both refreshing it and incrementing current player.
 		Siege.players[Siege.currentPlayer].refreshPlayer();
 		Siege.currentPlayer = (Siege.currentPlayer + 1)%Siege.numPlayers;
 	}

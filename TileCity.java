@@ -4,6 +4,7 @@ public class TileCity extends Tile{
 	
 	public static int CITY_INCOME = 10;
 	
+	// Local gold.
 	private Integer accGold;
 	
 	TileCity(int in_owner, Coord in_coord){
