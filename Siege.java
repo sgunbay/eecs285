@@ -142,6 +142,7 @@ public class Siege {
             	for (int i = 0; i < numUnits; ++i)
             		count += attemptTrain(t,unitType);
             	
+            	grid.setTile(city,t);
             	mainFrame.updateGridSquare(city);
             	mainFrame.printNarration(playerNames[currentPlayer] + " trains " + count + " " + unitType + " unit(s) at city " + city);
                 break;
@@ -174,8 +175,10 @@ public class Siege {
             	for (int i = 0; i < grid.rows; ++i){
             		for (int j = 0; j < grid.cols; ++j){
             			Tile tile = grid.getTile(new Coord(i,j));
-            			if (tile.owner >= numPlayers)
+            			if (tile.owner >= numPlayers){
             				grid.setTile(new Coord(i,j), new TileCity(-1,new Coord(i,j)));	
+                			System.out.println(grid.getTile(new Coord(i,j)).getColor());
+            			}
             		}
             	}
             	mainFrame.updateAllGridSquares();
