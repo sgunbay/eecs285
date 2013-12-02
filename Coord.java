@@ -11,8 +11,8 @@ public class Coord {
 		col = col_in;
 	}
 	
-	public String toString(){
-	  return "(" + row + ", " + col + ")";
+	public String toString(){		
+		return "(" + row + ", " + col + ")";
 	}
 	
 }

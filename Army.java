@@ -23,6 +23,7 @@ public class Army{
 		spd = new Double(70);
 		coord = in_coord;
 		possibleMoves = new Vector<Coord>();
+		possibleInfluences = new Vector<Coord>();
 	}
 
 	public String getColor(){
