@@ -72,7 +72,7 @@ public class ActionParser {
             return ActionType.END_TURN;
         else if (input.contains("changed their name to"))
             return ActionType.NAME_CHANGE;
-        else if (input.contains("is ready"))
+        else if (input.contains("All players ready"))
             return ActionType.IS_READY;
         else if (input.contains("Waiting for all players to be ready"))
             return ActionType.WAITING_FOR_PLAYERS;
