@@ -11,6 +11,7 @@ import com.eecs285.siegegame.ActionParser.ActionType;
 public class Siege {
 
     // These are required for the classes to work properly:
+	public static MainGameFrame mainFrame;
     public static Grid grid;
     public static int numCities;
     public static int numPlayers;
@@ -26,7 +27,18 @@ public class Siege {
     static int portNum = 45000;
     private final static String IPaddress = "67.194.55.95"; // server IP
     
-    
+    public static int attemptTrain(Tile city, String unitType){
+    	if (unitType.equalsIgnoreCase("Basic") && city.trainUnitBasic())
+			return 1;	
+		else if (unitType.equalsIgnoreCase("Explorer") && city.trainUnitExplorer())
+			return 1;
+		else if (unitType.equalsIgnoreCase("Attacker") && city.trainUnitAttacker())
+			return 1;
+		else if (unitType.equalsIgnoreCase("Rusher") && city.trainUnitRusher())
+			return 1;
+		else
+			return 0;
+    }
 
     public static void main(String args[]) throws Exception {
         // initialize connection to server (including IO streams)
@@ -40,7 +52,7 @@ public class Siege {
         final int rows = grid.rows;
         final int cols = grid.cols;
        
-        MainGameFrame mainFrame = new MainGameFrame(grid);
+        mainFrame = new MainGameFrame(grid);
 
         
         //get player names array from server
@@ -121,7 +133,16 @@ public class Siege {
                 System.out.println("Move Army");
                 break;
             case RECRUIT:
-                System.out.println("Recruit");
+            	city = parser.getFirstCoordinate();
+            	int numUnits = parser.getNumUnits();
+            	String unitType = parser.getTypeUnits();
+            	
+            	Tile t = grid.getTile(city);
+            	int count = 0;
+            	for (int i = 0; i < numUnits; ++i)
+            		count += attemptTrain(t,unitType);
+            	
+            	mainFrame.printNarration(players[currentPlayer] + " trains " + count + " " + unitType + " unit(s) at city " + city);
                 break;
             case RESOURCE_RECAPTURED:
                 System.out.println("Recapture Resource");
@@ -147,7 +168,18 @@ public class Siege {
             	break;
             case STARTING_GAME:
             	System.out.println("Starting game...");
-            	
+            	for (int i = 0; i < numPlayers; ++i)
+            		players[i].endTurn();
+            	for (int i = 0; i < grid.rows; ++i){
+            		for (int j = 0; j < grid.cols; ++j){
+            			Tile tile = grid.getTile(new Coord(i,j));
+            			if (tile.owner >= numPlayers)
+            				grid.setTile(new Coord(i,j), new TileCity(-1,new Coord(i,j)));	
+            		}
+            	}
+            	mainFrame.updateAllGridSquares();
+            	mainFrame.printNonePanel();
+            	mainFrame.updatePlayer();
             	
             	break;
             default:
