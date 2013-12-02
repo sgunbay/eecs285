@@ -70,8 +70,8 @@ public class Player {
 				Siege.grid.setTile(new Coord(i,j), target);
 			}
 		}
-		
-		updateIncome();
+		for (int i = 0; i < 4; ++i)
+			Siege.players[i].updateIncome();
 		gold = gold + income;
 	}
 	
