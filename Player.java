@@ -1,6 +1,7 @@
 package com.eecs285.siegegame;
 
 import java.awt.*;
+import java.util.Random;
 
 public class Player {
 
@@ -26,7 +27,7 @@ public class Player {
 				if (target.isCity() && (target.owner == id) && (target.infers == 0)){
 					income += target.income;
 				}
-				else if (target.isResource() && (target.owner == id) && (target.infers == 1)){
+				else if (target.isResource() && (target.owner == id) && (target.infers == 0)){
 					income += target.income;
 				}
 			}
@@ -51,8 +52,17 @@ public class Player {
 	}
 	
 	public void refreshPlayer(){
-		updateIncome();
-		gold = gold + income;
+		
+		for (int i = 0; i < Siege.grid.rows; ++i){
+			for (int j = 0; j < Siege.grid.cols; ++j){
+				Tile target = Siege.grid.getTile(new Coord(i,j));
+				target.infers = 0;
+				if (target.isResource())
+					target.owner = -1;
+				Siege.grid.setTile(new Coord(i,j), target);
+			}
+		}
+		
 		for (int i = 0; i < Siege.grid.rows; ++i){
 			for (int j = 0; j < Siege.grid.cols; ++j){
 				Tile target = Siege.grid.getTile(new Coord(i,j));
@@ -60,8 +70,14 @@ public class Player {
 				Siege.grid.setTile(new Coord(i,j), target);
 			}
 		}
+		
+		updateIncome();
+		gold = gold + income;
 	}
 	
-	// MORE FUNCTIONS!!
+	public void endTurn(){
+		Siege.players[Siege.currentPlayer].refreshPlayer();
+		Siege.currentPlayer = (Siege.currentPlayer + 1)%4;
+	}
 	
 }

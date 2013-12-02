@@ -1,45 +1,40 @@
 package com.eecs285.siegegame;
 
-import java.awt.*;
 import java.util.*;
 
 public class Army{
 	
 	public static int MAX_ARMY_SIZE = 100;
 	public static double RECOIL = 0.3;
-	public static Random rnd = new Random(System.currentTimeMillis());
 	
-	public Integer owner;
+	public int owner;
 	public Coord coord;
 	public Double dmg;
 	public Double spd;
-	public Double inf;
 	public Queue<Unit> units;
 	public Vector<Coord> possibleMoves;
-	public Integer steps;
+	public Vector<Coord> possibleInfluences;
 	
-	Army(Unit u, Coord in_coord){
-		owner = new Integer(Siege.currentPlayer);
+	
+	Army(int in_owner, Coord in_coord){
+		owner = in_owner;
 		units = new ArrayDeque<Unit>();
-		units.add(u);
-		dmg = u.dmg;
-		spd = u.spd;
-		inf = u.inf;
-		steps = spd.intValue();
+		dmg = new Double(-1);
+		spd = new Double(70);
 		coord = in_coord;
-		possibleMoves = updatePossibleMoves();
+		possibleMoves = new Vector<Coord>();
+	}
+
+	public String getColor(){
+		return "player" + owner + "color";
 	}
 	
-	public Color getColor(){
-		return 	Siege.players[owner].color;	
-	}
-	
-	private Boolean isEmpty(){
+	public Boolean isEmpty(){
 		return units.isEmpty();
 	}
 	
-	private Boolean isFull(){
-		return (units.size() == 100);		
+	public Boolean isFull(){
+		return (units.size() == MAX_ARMY_SIZE);		
 	}
 	
 	public Boolean addUnit(Unit u){
@@ -48,8 +43,6 @@ public class Army{
 		units.add(u);
 		dmg += u.dmg;
 		spd = Math.min(spd,u.spd);
-		inf = Math.max(inf,u.inf);
-		steps = spd.intValue();
 		return true;
 	}
 	
@@ -61,21 +54,16 @@ public class Army{
 
 		if (!isEmpty()){
 			Double min_spd = new Double(100);
-			Double max_inf = new Double(0);
-			for (Unit x : units){
+			for (Unit x : units)
 				min_spd = Math.min(min_spd,x.spd);
-				max_inf = Math.max(max_inf,x.inf);
-			}
 			spd = min_spd;
-			inf = max_inf;
 		}
-		steps = spd.intValue();
 		return u;		
 	}
 	
 	private Unit removeUnit(double probability){
 		assert(probability >= 0);
-		if (rnd.nextDouble() <= probability)
+		if (Siege.rnd.nextDouble() <= probability)
 			return removeUnit();
 		return null;
 	}
@@ -83,8 +71,7 @@ public class Army{
 	private Army mergeTo(Army a){
 		while (!isEmpty() && !a.isFull())
 			a.addUnit(removeUnit());	
-		a.possibleMoves = null;
-		a.steps = 0;
+		a.possibleMoves = new Vector<Coord>();
 		return a;
 	}
 
@@ -108,21 +95,32 @@ public class Army{
 				removeUnit(recoil);
 		}
 		
-		possibleMoves = null;
+		possibleMoves = new Vector<Coord>();
 		if (target.isEmpty())
 			return null;
 		return target;		
 	}
 
+	private boolean movesContains(Vector<Coord> moves, Coord c){
+		if (c.row == coord.row && c.col == coord.col)
+			return true;
+		
+		for (Coord i : moves){
+			if (i.row == c.row && i.col == c.col)
+				return true;
+		}
+		return false;		
+	}
+	
 	public Vector<Coord> updatePossibleMoves(){
 	// Returns a vector of all possible coords that this army can move to.
 		
-		if (steps == 0)
-			return null;
-		
-		double range = steps * Siege.grid.getTile(coord).getSpdFactor();
+		double range = spd * Siege.grid.getTile(coord).getSpdFactor();
 		int r = (int) range;
 		Vector<Coord> moves = new Vector<Coord>();
+		
+		if (units.size() == 0)
+			return moves;
 		
 		class PCoord{
 			Coord coord;
@@ -146,79 +144,112 @@ public class Army{
 			Coord [] next = new Coord[4];
 			next[0] = new Coord(c.coord.row,c.coord.col-1);
 			next[1] = new Coord(c.coord.row,c.coord.col+1);
-			next[2] = new Coord(c.coord.col+1,c.coord.col);
-			next[3] = new Coord(c.coord.col-1,c.coord.col);
+			next[2] = new Coord(c.coord.row+1,c.coord.col);
+			next[3] = new Coord(c.coord.row-1,c.coord.col);
 			for (int i = 0; i < 4; ++i){
 				if (Siege.grid.withinBounds(next[i]) && Siege.grid.getTile(next[i]).isPassable){
-					if (!moves.contains(next[i])){
+					if (!movesContains(moves,next[i])){
 						moves.add(next[i]);
 						possible.add(new PCoord(next[i],c.range-1));
 					}
 				}
 			}
 		}
-		
 		return moves;
 	}
 	
 	private void move(Coord target){
+		
 		Tile mytile = Siege.grid.getTile(coord);
 		Tile victimTile = Siege.grid.getTile(target);
-		victimTile.setOccupant(this);
+		
+		Siege.grid.setOccupantAt(target, this);
+		
 		if (victimTile.isCity())
 			victimTile.owner = owner;
-		mytile.setOccupant(null);
+		
+		Siege.grid.setOccupantAt(coord, null);
+		
+		if (mytile.isCity())
+			Siege.grid.setOccupantAt(coord, new Army(owner, coord));
+		
 		Siege.grid.setTile(coord, mytile);
-		Siege.grid.setTile(target, victimTile);	
 	}
+	
 	
 	public boolean attemptMove(Coord target){
 	// Returns true on successful move.
 	// Returns false on failure.
 		
 	// Attempts to move, attack or merge.
-		if (possibleMoves == null || !possibleMoves.contains(target)){
+		if (possibleMoves.size() == 0 || (coord.row == target.row && coord.col == target.col) || !movesContains(possibleMoves, target)){
 			return false;
 		}
 		
-		Tile mytile = Siege.grid.getTile(coord);
-		Tile victimTile = Siege.grid.getTile(target);
-		if (victimTile.getOccupant() != null){
-			if (victimTile.getOccupant().owner != owner){
-				victimTile.setOccupant(attack(victimTile.getOccupant()));
-				if (victimTile.getOccupant() == null)
-					move(target);
-			}
-			else {
-				victimTile.setOccupant(mergeTo(victimTile.getOccupant()));
-			}
-			possibleMoves = null;
-			Siege.grid.setTile(target,victimTile);
-			mytile.setOccupant(this);
-			Siege.grid.setTile(coord,mytile);
-			return true;
-		}		
+		Army victim = Siege.grid.getOccupantAt(target);
+		if (victim != null){
+			if (victim.owner != owner)
+				Siege.grid.setOccupantAt(target,attack(victim));	
+			else
+				Siege.grid.setOccupantAt(target,mergeTo(victim));
+		}
 		
-		move(target);
-	
+		if (isEmpty()){
+			Siege.grid.setOccupantAt(coord,null);
+		}
+		else if (Siege.grid.getOccupantAt(target) == null)
+			move(target);
+		
 		// Update yourself.
 		coord = target;
-		possibleMoves = updatePossibleMoves();
-		return true;
-	}
-	
-	public boolean withinInfRange(Coord target){
-		int rowdist = target.row - coord.row;
-		int coldist = target.col - coord.col;
-		double range = inf * Siege.grid.getTile(coord).getInfFactor();
-		if ((rowdist + coldist) > range)
-			return false;
+		possibleMoves = new Vector<Coord>();
 		return true;
 	}
 
+	private void updatePossibleInfluences(){
+		
+		possibleInfluences = new Vector<Coord>();
+		
+		if (isEmpty())
+			return;
+		
+		double range = spd * Siege.grid.getTile(coord).getSpdFactor();
+		int r = (int) range;
+		
+		for (int i = coord.row-r; i < coord.row+r; ++i){
+			for (int j = coord.col-r; j < coord.col+r; ++j){
+				Coord c = new Coord(i,j);
+				if (Siege.grid.withinBounds(c))
+					possibleInfluences.add(c);
+			}
+		}
+		
+		return;
+	}
+	
+	public void updateInfluences(){
+		if (isEmpty())
+			return;
+		
+		updatePossibleInfluences();
+		for (Coord c : possibleInfluences){
+			Tile t = Siege.grid.getTile(c);	
+			
+			if ((t.isCity() || t.isResource()) && (t.owner != owner) && (t.owner != -1)){	
+				t.infers++;
+			}	
+			else if (t.isResource() && (t.owner == -1)){
+				t.owner = owner;
+			}	
+			
+			Siege.grid.setTile(c, t);
+		}	
+	}
+	
 	public void refreshArmy(){
-		steps = spd.intValue();
-		possibleMoves = updatePossibleMoves();	
+		updateInfluences();
+		if (owner == Siege.currentPlayer)
+			possibleMoves = updatePossibleMoves();
 	}
 	
 }

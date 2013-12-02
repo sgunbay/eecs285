@@ -1,7 +1,5 @@
 package com.eecs285.siegegame;
 
-import java.awt.Color;
-
 public class TileResource extends Tile {
 
 	static int SMALL = 10;
@@ -9,7 +7,7 @@ public class TileResource extends Tile {
 	static int LARGE = 20;
 	
 	TileResource(int in_amount, Coord in_coord){
-		super("Resource",false,in_coord);
+		super("resource",false,in_coord);
 		owner = new Integer(-1);
 		income = new Integer(in_amount);
 	}
@@ -22,10 +20,10 @@ public class TileResource extends Tile {
 		return 0.0;
 	}
 	
-	public Color getColor(){
+	public String getColor(){
 		if (owner != -1)
-			return Siege.players[owner].color;
-		return Color.PINK;
+			return "player" + owner + "color";	
+		return name + "Default";
 	}
-
+	
 }

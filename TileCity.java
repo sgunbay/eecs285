@@ -1,7 +1,5 @@
 package com.eecs285.siegegame;
 
-import java.awt.Color;
-
 public class TileCity extends Tile{
 	
 	public static int CITY_INCOME = 10;
@@ -9,11 +7,20 @@ public class TileCity extends Tile{
 	private Integer accGold;
 	
 	TileCity(int in_owner, Coord in_coord){
-		super("City",true,in_coord);
+		super("city",true,in_coord);
 		owner = new Integer(in_owner);
 		income = new Integer(CITY_INCOME);
 		infers = new Integer(0);
 		accGold = new Integer(0);
+		if (owner != -1){
+			a = new Army(in_owner,coord);	
+		}
+	}
+	
+	public String getColor(){
+		if (owner != -1)
+			return "player" + owner + "color";	
+		return name + "Default";
 	}
 	
 	public Double getSpdFactor(){
@@ -22,12 +29,6 @@ public class TileCity extends Tile{
 	
 	public Double getInfFactor(){
 		return 1.0;
-	}
-	
-	public Color getColor(){		
-		if (owner == -1)
-			return Color.WHITE;
-		return Siege.players[owner].color;
 	}
 		
 	public void updateAccGold(){
@@ -42,6 +43,7 @@ public class TileCity extends Tile{
 	}
 
 	public int getGold(){
+	// Returns disposable income.
 		if (infers > 0)
 			return accGold;
 		else
@@ -49,40 +51,37 @@ public class TileCity extends Tile{
 	}
 	
 	private boolean trainUnit(Unit u){
-		if (u.cost > getGold())
+		if (u.cost > getGold() || a.isFull())
 			return false;
 		a.addUnit(u);
-		Siege.players[owner].subtractGold(u.cost);
+		if (infers == 0)
+			Siege.players[owner].subtractGold(u.cost);
+		else
+			accGold -= u.cost;
 		
 		// Update map.
-		Tile t = Siege.grid.getTile(coord);
-		t.setOccupant(a);
-		Siege.grid.setTile(coord,t);
+		Siege.grid.setOccupantAt(coord,a);
 		return true;		
 	}
 	
 	public boolean trainUnitBasic(){
-		Unit u = new UnitBasic();
-		return trainUnit(u);
+		return trainUnit(new UnitBasic());
 	}
 	
 	public boolean trainUnitAttacker(){
-		Unit u = new UnitAttacker();
-		return trainUnit(u);
+		return trainUnit(new UnitAttacker());
 	}
 	
 	public boolean trainUnitRusher(){
-		Unit u = new UnitRusher();
-		return trainUnit(u);
+		return trainUnit(new UnitRusher());
 	}
 	
 	public boolean trainUnitExplorer(){
-		Unit u = new UnitExplorer();
-		return trainUnit(u);
+		return trainUnit(new UnitExplorer());
 	}
 	
 	public void refreshTile(){
-		super.refreshTile();	
+		super.refreshTile();
 		if (owner == Siege.currentPlayer)
 			updateAccGold();
 	}

@@ -9,7 +9,7 @@ public abstract class Tile {
 	public final String name;
 	public final boolean isPassable;
 	public final Coord coord;
-	public Integer owner;
+	public int owner;
 	public Integer income;
 	public int infers;
 	public Army a;
@@ -29,19 +29,21 @@ public abstract class Tile {
 		isPassable = in_passable;
 		coord = in_coord;
 	}
+	
 	public String toString(){
 		return name;
+	}
+	
+	public int getGold(){
+		return 0;
 	}
 	
 	public abstract Double getSpdFactor();
 	
 	public abstract Double getInfFactor();
 	
-	public abstract Color getColor();
-	
-	public void refreshTile(){
-		if (a != null && a.owner == Siege.currentPlayer)
-			a.refreshArmy();
+	public String getColor(){
+		return name;		
 	}
 	
 	public Army getOccupant(){
@@ -53,10 +55,32 @@ public abstract class Tile {
 	}
 	
 	public boolean isCity(){
-		return name.equalsIgnoreCase("City");	
+		return name.equalsIgnoreCase("city");	
 	}
 	
 	public boolean isResource(){
-		return name.equalsIgnoreCase("Resource");	
+		return name.equalsIgnoreCase("resource");	
 	}
+	
+	public void refreshTile(){
+		if (a != null)
+			a.refreshArmy();
+	}
+	
+	public boolean trainUnitBasic(){
+		return false;
+	}
+	
+	public boolean trainUnitAttacker(){
+		return false;
+	}
+	
+	public boolean trainUnitRusher(){
+		return false;
+	}
+	
+	public boolean trainUnitExplorer(){
+		return false;
+	}
+	
 }
