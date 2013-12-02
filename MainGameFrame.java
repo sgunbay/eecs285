@@ -124,9 +124,12 @@ public class MainGameFrame extends JFrame {
   JLabel resourceBonus;
 
   public MainGameFrame(Grid grid) throws Exception {
+    //initilaize Siege automatically
     super("Siege");
     ImageIcon icon = new ImageIcon("src/Resources/castleIcon3.png");
     setIconImage(icon.getImage());
+    
+    //Initilaize all constants
     ROWS = grid.rows;
     COLS = grid.cols;
 
@@ -135,6 +138,7 @@ public class MainGameFrame extends JFrame {
     ATTACKER_COST = new UnitAttacker().cost;
     RUSHER_COST = new UnitRusher().cost;
 
+    //Figure out optimal window size
     TASKBAR_HEIGHT = Toolkit.getDefaultToolkit().getScreenInsets(
         getGraphicsConfiguration()).bottom;
     SCREEN_HEIGHT = (int) GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -159,6 +163,7 @@ public class MainGameFrame extends JFrame {
       currentNames.add(name);
     }
 
+    //initialize gridSquares
     gridSquares = new JPanel[ROWS][COLS];
 
     for (int i = 0; i < ROWS; i++) {
@@ -458,8 +463,7 @@ public class MainGameFrame extends JFrame {
     HUDCitySelectPanel.add(cityStatus_CITY, BorderLayout.NORTH);
     HUDCitySelectPanel.add(HUDCitySelectMainPanel, BorderLayout.CENTER);
 
-    // **********************************RESOURCE SELECT
-    // HUD************************************
+    // *********************RESOURCE SELECT HUD*********************
     HUDResSelectPanel = new JPanel(new GridLayout(4, 1));
 
     resourceState = new JLabel("Resource is owned by Jordan", JLabel.CENTER);
@@ -520,6 +524,7 @@ public class MainGameFrame extends JFrame {
     }
   }
 
+  //Tell server that info is ready
   public class ReadyButtonListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
       readyButton.setEnabled(false);
@@ -535,8 +540,8 @@ public class MainGameFrame extends JFrame {
     }
   }
 
+  
   public class UnitButtonListener implements ActionListener {
-
     public void actionPerformed(ActionEvent e) {
       Tile relevant = currentSelected;
       if (e.getSource() == basicRadioBut_CITY) {
@@ -589,7 +594,6 @@ public class MainGameFrame extends JFrame {
         } else
           System.out.println("Nothing selected");
         trainingButtons_CITY.clearSelection();
-        // Player trains 50 Basic unit(s) at city (r, c)
       }
     }
   }
@@ -600,6 +604,7 @@ public class MainGameFrame extends JFrame {
     }
   }
 
+  //GUI Click/Enter/Exit functionality
   public class GridSquareMouseListener extends MouseAdapter {
     public void mouseClicked(MouseEvent e) {
       if (currentSelected != null && currentSelected.getOccupant() != null) {
@@ -625,7 +630,7 @@ public class MainGameFrame extends JFrame {
                 cityMainLayout.show(HUDCitySelectMainPanel, "my");
 
               } else if (Siege.grid.getTile(new Coord(i, j)).getOccupant() != null
-                  && Siege.grid.getTile(new Coord(i, j)).owner == id) {
+                  && Siege.grid.getTile(new Coord(i, j)).getOccupant().owner == id) {
                 currentSelected = Siege.grid.getTile(new Coord(i, j));
                 printArmyPanel(currentSelected);
                 HUDLayout.show(HUDTopPanel, "Army");
