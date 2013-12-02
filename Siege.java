@@ -1,6 +1,7 @@
 package com.eecs285.siegegame;
 
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.Random;
@@ -30,19 +31,16 @@ public class Siege {
         // initialize connection to server (including IO streams)
         initServerConnection();
 
-        final int rows = 25;
-        final int cols = 40;
+        File map = new File("src/Resources/test0.map");
 
-        grid = new Grid(rows, cols);
-        grid.initialize();
-
+        grid = new Grid(1);
+        grid.load(map);
+        
+        final int rows = grid.rows;
+        final int cols = grid.cols;
+       
         MainGameFrame mainFrame = new MainGameFrame(grid);
-        mainFrame.printNarration("Jordan added a bit of functionality");
-        mainFrame.printNarration("Jordan tested the functionality");
-        mainFrame.printNarration("Jordan is making sure the scrollbar works");
-        for (int i = 0; i < 50; i++)
-            mainFrame.printNarration("Filling in 50 lines...");
-        mainFrame.printNarration("Jordan ended turn");
+
         
         //get player names array from server
         playerNames = (String[]) in.readObject();
@@ -157,15 +155,15 @@ public class Siege {
             case NAME_CHANGE:
                 System.out.println("Name change occured");
                 break;
-            case WAITING_FOR_PLAYERS:
-                System.out.println("Waiting for players...");
-                break;
-            case STARTING_GAME:
-                System.out.println("Starting game");
-                break;
             case IS_READY:
-                System.out.println("Is ready");
-                break;
+            	System.out.println("You are ready.");
+            	break;
+            case WAITING_FOR_PLAYERS:
+            	System.out.println("Waiting for players...");
+            	break;
+            case STARTING_GAME:
+            	System.out.println("Starting game...");
+            	break;
             default:
                 System.out
                         .println("ERROR: Action did not specify a known ActionType");
@@ -207,12 +205,8 @@ public class Siege {
         for (int i = 0; i < input.length(); i++) {
             if (Character.isLetterOrDigit(input.charAt(i))
                     || input.charAt(i) == ' ' || input.charAt(i) == '('
-                    || input.charAt(i) == ')' || input.charAt(i) == ','
-<<<<<<< HEAD
+                    || input.charAt(i) == ')' || input.charAt(i) == ',' 
                     || input.charAt(i) == '.' || input.charAt(i) == '!')
-=======
-                    || input.charAt(i) == '.' || input.charAt(i) == '!');
->>>>>>> aeaf7f7c55cc0a5821f60edfe98b983ca51b5f86
                 temp += input.charAt(i);
         }
         return temp;

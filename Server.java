@@ -6,17 +6,18 @@ import java.net.Socket;
 
 public class Server {
 
-    static MiniServer[] allClients; // contains all connected clients
+	static MiniServer[] allClients; // contains all connected clients
 
-    // arrays to contain playerNames and whether players have chosen names yet
-    static String[] playerNames;
-    static boolean[] chosen; // if name chosen
-    static boolean[] ready; // players ready?
-    static boolean connectionAllowed = true; // if additional players can join
-    static int numPlayer = 0;
-    static int MAX_PLAYERS;
+	// arrays to contain playerNames and whether players have chosen names yet
+	static String[] playerNames = { "Player 0", "Player 1", "Player 2",
+			"Player 3" };
+	static boolean[] chosen; // if name chosen
+	static boolean[] ready; // players ready?
+	static boolean connectionAllowed = true; // if additional players can join
+	static int numPlayer = 0;
+	static int MAX_PLAYERS;
 
-    public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
         
         MAX_PLAYERS = Integer.valueOf(args[0]);
 
@@ -34,10 +35,6 @@ public class Server {
         ready = new boolean[MAX_PLAYERS];
         for(int i = 0; i < MAX_PLAYERS; i++)
             chosen[i] = ready[i] = false;
-        playerNames = new String[MAX_PLAYERS];
-        for(int i = 0; i < MAX_PLAYERS; i++) {
-            playerNames[i] = ("Player " + i);
-        }
         
 
         // allow connections until 2 - 4 players have connected to the server
@@ -59,18 +56,19 @@ public class Server {
         System.out.println("CONNECTIONS NOT ALLOWED");        
 
         // Delay sending of names array until all players have chosen
-        boolean allChosen = false;        
+        boolean allChosen = false;
+       
         while (!allChosen){
-            allChosen = true;
+        	allChosen = true;
             for (int i = 0; i < MAX_PLAYERS; ++i){
-                if (!chosen[i])
-                    allChosen = false;
-            }            
+            	if (!chosen[i])
+            		allChosen = false;
+            }
+        	
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {}
         }
-        
         // send player names to clients (using first client's output stream)
         System.out.println("Sending playerNames[] to all clients...");
         allClients[0].broadcastToClients(playerNames);
@@ -90,16 +88,16 @@ public class Server {
         allClients[0].broadcastToClients("All players ready. Starting the game now. Good luck, have fun!");
     }
 
-    private static boolean checkReady() {
-        // if all connected are ready, prevent additional connections
-        int counter = 0;
-        for (int i = 0; i < MAX_PLAYERS; i++) {
-           if(ready[i])
-               counter++;
-        }
-        
-        if(counter == MAX_PLAYERS)
-            return true;
-        return false;
-    }
+	private static boolean checkReady() {
+		// if all connected are ready, prevent additional connections
+		int counter = 0;
+		for (int i = 0; i < MAX_PLAYERS; i++) {
+			if (ready[i])
+				counter++;
+		}
+
+		if (counter == MAX_PLAYERS)
+			return true;
+		return false;
+	}
 }
