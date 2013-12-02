@@ -1124,6 +1124,7 @@ public class MainGameFrame extends JFrame {
 
   void updatePlayer() {
     if (!Siege.players[Siege.currentPlayer].name.equalsIgnoreCase(name)) {
+      currentSelected = null;
       HUDLayout.show(HUDTopPanel, "Lock");
       currentHUDCard = "Lock";
       endTurnButton.setEnabled(false);
