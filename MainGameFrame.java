@@ -167,13 +167,8 @@ public class MainGameFrame extends JFrame {
         LayoutManager overlay = new OverlayLayout(adding);
         gridSquares[i][j] = adding;
         gridSquares[i][j].setLayout(overlay);
-        if (Siege.grid.getTile(new Coord(i, j)) != null)
-          gridSquares[i][j].setBackground(stringToColor(Siege.grid.getTile(
+        gridSquares[i][j].setBackground(stringToColor(Siege.grid.getTile(
               new Coord(i, j)).getColor()));
-        else {
-          // mapTiles[i][j] is a city and I need to pick the image of the right
-          // color
-        }
         gridSquares[i][j].addMouseListener(gridSquareMouseListener);
         gridSquares[i][j]
             .setPreferredSize(new Dimension(SQUARESIZE, SQUARESIZE));
@@ -501,7 +496,7 @@ public class MainGameFrame extends JFrame {
 
     add(auxPanel, BorderLayout.WEST);
 
-    updateAllGridSquares();
+    //updateAllGridSquares();
     pack();
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setVisible(true);
@@ -852,17 +847,15 @@ public class MainGameFrame extends JFrame {
     if (in.isCity() || in.isResource())
       color = guessResourceBackground(in);
     else if (color.equals("plains"))
-      gridSquares[in.coord.row][in.coord.col].setBackground(Color.GREEN
-          .darker());
+      gridSquares[in.coord.row][in.coord.col].setBackground(stringToColor("plains"));
     else if (color.equals("forest"))
-      gridSquares[in.coord.row][in.coord.col].setBackground(Color.green
-          .darker().darker());
+      gridSquares[in.coord.row][in.coord.col].setBackground(stringToColor("forest"));
     else if (color.equals("muddy"))
       gridSquares[in.coord.row][in.coord.col]
-          .setBackground(new Color(90, 90, 0));
+          .setBackground(stringToColor("muddy"));
     else if (color.equals("mountain"))
       gridSquares[in.coord.row][in.coord.col]
-          .setBackground(new Color(90, 50, 0));
+          .setBackground(stringToColor("mountain"));
     else if (color.equals("water"))
       gridSquares[in.coord.row][in.coord.col].setBackground(Color.BLUE);
     else {
@@ -899,9 +892,9 @@ public class MainGameFrame extends JFrame {
     else if (in.equals("forest"))
       return Color.green.darker().darker().darker();
     else if (in.equals("muddy"))
-      return Color.yellow.darker();
+      return new Color(218, 165, 32);
     else if (in.equals("mountain"))
-      return new Color(90, 50, 0);
+      return new Color(42, 42, 0);
     else if (in.equals("water"))
       return Color.BLUE;
     else
