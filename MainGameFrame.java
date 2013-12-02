@@ -66,7 +66,15 @@ public class MainGameFrame extends JFrame {
   final Font POSITION_FONT = new Font(Font.SERIF, Font.PLAIN, 12);
   final Font HUD_HEADER_FONT = new Font(Font.SANS_SERIF, Font.PLAIN, 18);
 
+  final int BASIC_COST;
+  final int EXPLORER_COST;
+  final int ATTACKER_COST;
+  final int RUSHER_COST;
+  final Integer MAX_ARMY_SIZE = 100;
+  
   GetNameDialog getNameDialog;
+  
+  
   String name;
   static Integer playerIndex = 0;
   static ArrayList<String> currentNames = new ArrayList<String>();
@@ -122,6 +130,11 @@ public class MainGameFrame extends JFrame {
     ROWS = grid.rows;
     COLS = grid.cols;
 
+    BASIC_COST = new UnitBasic().cost;
+    EXPLORER_COST = new UnitExplorer().cost;
+    ATTACKER_COST = new UnitAttacker().cost;
+    RUSHER_COST = new UnitRusher().cost;
+    
     TASKBAR_HEIGHT = Toolkit.getDefaultToolkit().getScreenInsets(
         getGraphicsConfiguration()).bottom;
     SCREEN_HEIGHT = (int) GraphicsEnvironment.getLocalGraphicsEnvironment()
@@ -443,8 +456,7 @@ public class MainGameFrame extends JFrame {
     HUDCitySelectPanel.add(cityStatus_CITY, BorderLayout.NORTH);
     HUDCitySelectPanel.add(HUDCitySelectMainPanel, BorderLayout.CENTER);
 
-    // **********************************RESOURCE SELECT
-    // HUD************************************
+    // **********************************RESOURCE SELECT HUD************************************
     HUDResSelectPanel = new JPanel(new GridLayout(4, 1));
 
     resourceState = new JLabel("Resource is owned by Jordan", JLabel.CENTER);
@@ -512,19 +524,19 @@ public class MainGameFrame extends JFrame {
     public void actionPerformed(ActionEvent e) {
       if (e.getSource() == basicRadioBut_CITY) {
         System.out.println("Clicked on basic unit button");
-        trainingButton.setText(getPriceOf(5));// price of basic * num
+        trainingButton.setText(getPriceOf(BASIC_COST));// price of basic * num
       }
       if (e.getSource() == attackerRadioBut_CITY) {
         System.out.println("Clicked on attacker unit button");
-        trainingButton.setText(getPriceOf(8));// price of attacker * num
+        trainingButton.setText(getPriceOf(ATTACKER_COST));// price of attacker * num
       }
       if (e.getSource() == explorerRadioBut_CITY) {
         System.out.println("Clicked on explorer unit button");
-        trainingButton.setText(getPriceOf(8));// price of explorer * num
+        trainingButton.setText(getPriceOf(EXPLORER_COST));// price of explorer * num
       }
       if (e.getSource() == rusherRadioBut_CITY) {
         System.out.println("Clicked on rusher unit button");
-        trainingButton.setText(getPriceOf(10));// price of rusher * num
+        trainingButton.setText(getPriceOf(RUSHER_COST));// price of rusher * num
       }
       if (e.getSource() == trainingButton) {
         System.out.println("Spend " + trainingButton.getText() + " to get "
@@ -972,10 +984,10 @@ public class MainGameFrame extends JFrame {
       toReturn = 0;
       trainNumberOfUnits.setText("0");
     }
-    if (num > 20) {
-      num = 20;
+    if (num > MAX_ARMY_SIZE) {
+      num = MAX_ARMY_SIZE;
       toReturn = cost * num;
-      trainNumberOfUnits.setText("20");
+      trainNumberOfUnits.setText(MAX_ARMY_SIZE.toString());
     }
     if (num < 0) {
       num = 0;
