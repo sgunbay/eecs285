@@ -2,6 +2,7 @@ package com.eecs285.siegegame;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -50,6 +51,8 @@ public class MainGameFrame extends JFrame {
   JPanel HUDNoneSelectMiddlePanel, HUDLockedMainPanel;
   JLabel currentGold, currentIncome;
 
+  JPanel statsPanel;
+  
   JPanel currentPositionPanel;
   JLabel currentPositionLabel;
   JPanel[][] gridSquares;
@@ -484,7 +487,17 @@ public class MainGameFrame extends JFrame {
     HUDPanel.add(HUDTopPanel, BorderLayout.CENTER);
     HUDPanel.add(currentPositionPanel, BorderLayout.SOUTH);
 
+    statsPanel = new JPanel(new GridLayout(3, 1));
+    statsPanel.add(currentGold);
+    statsPanel.add(currentIncome);
+    
+    JPanel endTurnButtonPanel = new JPanel();
+    endTurnButton.setEnabled(false);
+    endTurnButtonPanel.add(endTurnButton);
+    statsPanel.add(endTurnButtonPanel);
+    
     auxPanel.add(narrationPanel, BorderLayout.CENTER);
+    auxPanel.add(statsPanel, BorderLayout.NORTH);
     auxPanel.add(HUDPanel, BorderLayout.SOUTH);
 
     add(auxPanel, BorderLayout.WEST);
@@ -498,6 +511,7 @@ public class MainGameFrame extends JFrame {
   public class EndTurnButtonListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
       if (e.getSource() == endTurnButton) {
+        endTurnButton.setEnabled(false);
         System.out.println(name + " ends turn");
         try {
           Siege.sendToServer(name + " ends turn");
@@ -510,6 +524,7 @@ public class MainGameFrame extends JFrame {
 
   public class ReadyButtonListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
+      readyButton.setEnabled(false);
       if (e.getSource() == readyButton) {
         readyLabel.setText("Waiting...");
         System.out.println(name + " is ready");
@@ -518,7 +533,6 @@ public class MainGameFrame extends JFrame {
         } catch (Exception ex) {
           System.exit(-1);
         }
-        readyButton.setEnabled(false);
       }
     }
   }
@@ -526,6 +540,9 @@ public class MainGameFrame extends JFrame {
   public class UnitButtonListener implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
+      Tile relevant = currentSelected;
+      if (relevant == null)
+        relevant = prevSelected;
       if (e.getSource() == basicRadioBut_CITY) {
         System.out.println("Clicked on basic unit button");
         trainingButton.setText(getPriceOf(BASIC_COST));// price of basic * num
@@ -548,28 +565,28 @@ public class MainGameFrame extends JFrame {
         if (basicRadioBut_CITY.isSelected()) {
           try {
             Siege.sendToServer(name + " trains " + trainNumberOfUnits.getText()
-                + " Basic units at city " + currentSelected.coord);
+                + " Basic units at city " + relevant.coord);
           } catch (Exception e1) {
             e1.printStackTrace();
           }
         } else if (attackerRadioBut_CITY.isSelected()) {
           try {
             Siege.sendToServer(name + " trains " + trainNumberOfUnits.getText()
-                + " Attacker units at city " + currentSelected.coord);
+                + " Attacker units at city " + relevant.coord);
           } catch (Exception e1) {
             e1.printStackTrace();
           }
         } else if (explorerRadioBut_CITY.isSelected()) {
           try {
             Siege.sendToServer(name + " trains " + trainNumberOfUnits.getText()
-                + " Explorer units at city " + currentSelected.coord);
+                + " Explorer units at city " + relevant.coord);
           } catch (Exception e1) {
             e1.printStackTrace();
           }
         } else if (rusherRadioBut_CITY.isSelected()) {
           try {
             Siege.sendToServer(name + " trains " + trainNumberOfUnits.getText()
-                + " Rusher units at city " + currentSelected.coord);
+                + " Rusher units at city " + relevant.coord);
           } catch (Exception e1) {
             e1.printStackTrace();
           }
@@ -596,7 +613,8 @@ public class MainGameFrame extends JFrame {
         for (Integer i = 0; i < ROWS; i++)
           for (Integer j = 0; j < COLS; j++)
             if (e.getSource() == gridSquares[i][j]) {
-              currentSelected = Siege.grid.getTile(new Coord(i, j));
+              if (Siege.grid.getTile(new Coord(i, j)).owner != -1 && Siege.players[Siege.grid.getTile(new Coord(i, j)).owner].name.equals(name))
+                currentSelected = Siege.grid.getTile(new Coord(i, j));
               if (prevSelected != null && (currentSelected != prevSelected)
                   && prevSelected.getOccupant() != null) {
                 // if last click is outlined
@@ -605,7 +623,7 @@ public class MainGameFrame extends JFrame {
               }
               rowNumber = i;
               colNumber = j;
-              if (prevSelected == null || prevSelected.getOccupant() == null) {
+              if ((prevSelected == null || prevSelected.getOccupant() == null) && currentSelected != null) {
                 // last click not an army
                 if (currentSelected.getOccupant() != null
                     && !currentSelected.isCity()) {// occupied by army
@@ -716,7 +734,7 @@ public class MainGameFrame extends JFrame {
             outlineSquare(currentSelected.coord);
           if (prevSelected != null)
             undoOutlineSquare(prevSelected.coord);
-          if (currentSelected == prevSelected && !currentSelected.isCity()) {
+          if (currentSelected != null && prevSelected != null && currentSelected == prevSelected && !currentSelected.isCity()) {
             System.out.println("Clicked on same space");
             currentSelected = null;
           }
@@ -769,7 +787,8 @@ public class MainGameFrame extends JFrame {
                 .brighter());
             currentPositionLabel.setText("(Row: " + i + " Col: " + j + ")");
 
-            if (currentTile.getOccupant() != null
+            if (currentTile != null && currentTile.getOccupant() != null
+                && currentTile.getOccupant().owner != -1
                 && Siege.players[currentTile.getOccupant().owner].name
                     .equals(name)) {
               for (Coord x : currentTile.getOccupant().possibleInfluences) {
@@ -797,7 +816,8 @@ public class MainGameFrame extends JFrame {
         for (Integer j = 0; j < COLS; j++) {
           if (e.getSource() == gridSquares[i][j]) {
             Tile currentTile = Siege.grid.getTile(new Coord(i, j));
-            if (currentTile.getOccupant() != null
+            if (currentTile != null && currentTile.getOccupant() != null
+                && currentTile.getOccupant().owner != -1
                 && Siege.players[currentTile.getOccupant().owner].name
                     .equals(name)) {
               for (Coord x : currentTile.getOccupant().possibleInfluences) {
@@ -1040,6 +1060,7 @@ public class MainGameFrame extends JFrame {
         + Siege.players[Siege.currentPlayer].getGold());
     currentIncome.setText("Current Income: $"
         + Siege.players[Siege.currentPlayer].getIncome());
+    endTurnButton.setEnabled(true);
   }
 
   void printUnoccupiedCityPanel(Tile noneTile) {
