@@ -26,7 +26,8 @@ public class ActionParser {
         PLAYER_DEFEATED,
         PLAYER_WINS,
         END_TURN,
-        NAME_CHANGE
+        NAME_CHANGE,
+        IS_READY
     }
 
     ActionType getActionType() {
@@ -71,6 +72,8 @@ public class ActionParser {
             return ActionType.END_TURN;
         else if(input.contains("changed their name to"))
             return ActionType.NAME_CHANGE;
+        else if(input.contains("is ready"))
+            return ActionType.IS_READY;
 
         return null;
     }

@@ -1,13 +1,10 @@
 package com.eecs285.siegegame;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.util.Random;
 
 import com.eecs285.siegegame.ActionParser.ActionType;
 
@@ -19,6 +16,7 @@ public class Siege {
     public static int currentPlayer;
     public static Player[] players;
     public static String[] playerNames;
+    public static Random rnd = new Random(10000);
 
     // required for networking functionality
     // static BufferedReader in;
@@ -49,10 +47,6 @@ public class Siege {
         for (int i = 0; i < 50; i++)
             mainFrame.printNarration("Filling in 50 lines...");
         mainFrame.printNarration("Jordan ended turn");
-
-        Coord oneOne = new Coord(1, 1);
-        Tile plains = new TilePlains(oneOne);
-        mainFrame.updateGridSquare(oneOne, plains);
         
         //get player names array from server
         playerNames = (String[]) in.readObject();
