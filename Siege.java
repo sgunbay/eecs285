@@ -47,7 +47,7 @@ public class Siege {
         //get player names array from server
         playerNames = (String[]) in.readObject();
         playerNames = fixDuplicates(playerNames);
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < playerNames.length; i++) {
             System.out.println("playerNames[" + i + "] = " + playerNames[i]);
         }
         
