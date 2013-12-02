@@ -1005,10 +1005,15 @@ public class MainGameFrame extends JFrame {
   }
 
   void printNonePanel() {
+    int i = 0;
+    for (Player play : Siege.players){
+      if (play.name.equalsIgnoreCase(name))
+        i = play.id;
+    }
     currentGold.setText("Current Gold: $"
-        + Siege.players[Siege.currentPlayer].getGold());
+        + Siege.players[i].getGold());
     currentIncome.setText("Current Income: $"
-        + Siege.players[Siege.currentPlayer].getIncome());
+        + Siege.players[i].getIncome());
   }
 
   void printUnoccupiedCityPanel(Tile noneTile) {
