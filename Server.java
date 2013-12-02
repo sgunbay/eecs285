@@ -1,7 +1,6 @@
 package com.eecs285.siegegame;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -12,13 +11,15 @@ public class Server {
     // arrays to contain playerNames and whether players have chosen names yet
     static String[] playerNames = { "Player 0", "Player 1", "Player 2",
             "Player 3" };
-    static boolean[] chosen = { false, false, false, false }; // if name chosen
-    static boolean[] ready = { false, false, false, false }; // players ready?
+    static boolean[] chosen; // if name chosen
+    static boolean[] ready; // players ready?
     static boolean connectionAllowed = true; // if additional players can join
     static int numPlayer = 0;
-    final static int MAX_PLAYERS = 4;
+    static int MAX_PLAYERS;
 
     public static void main(String[] args) throws IOException {
+        
+        MAX_PLAYERS = Integer.valueOf(args[0]);
 
         ServerSocket serverSocket = null;
         try {
@@ -28,12 +29,19 @@ public class Server {
             System.exit(-1);
         }
 
+        // Instantiate arrays
         allClients = new MiniServer[MAX_PLAYERS];
-
+        chosen = new boolean[MAX_PLAYERS];
+        ready = new boolean[MAX_PLAYERS];
+        for(int i = 0; i < MAX_PLAYERS; i++)
+            chosen[i] = ready[i] = false;
         
+
         // allow connections until 2 - 4 players have connected to the server
         // and all connected clients are ready
-        while (connectionAllowed && numPlayer < MAX_PLAYERS) {
+        while (numPlayer < MAX_PLAYERS) {
+            System.out.println("Connection still allowed");
+
             // accept connection and start a new MiniServer for that client
             Socket clientSocket = serverSocket.accept();
             MiniServer server = new MiniServer(clientSocket, numPlayer);
@@ -43,30 +51,46 @@ public class Server {
             // announce start of server, increment number of connected players
             System.out.println("Server " + numPlayer + " started");
             numPlayer++;
-            
-            checkConnectionAllowed();
         }
+
+        System.out.println("CONNECTIONS NOT ALLOWED");        
 
         // Delay sending of names array until all players have chosen
         while (!(chosen[0] && chosen[1] && chosen[2] && chosen[3]))
             try {
                 Thread.sleep(500);
-            } catch (InterruptedException e) {}
-
+            } catch (InterruptedException e) {
+            }
+        
         // send player names to clients (using first client's output stream)
         System.out.println("Sending playerNames[] to all clients...");
-        // allClients[0].oStream.writeObject(playerNames);
         allClients[0].broadcastToClients(playerNames);
         System.out.println("Done.");
+        
+        
+        System.out.print("Waiting for all players to be ready");
+        allClients[0].broadcastToClients("Waiting for all players to be ready...");
 
+        while (!checkReady()) 
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+            }
+        
+        System.out.println("All players ready.");
+        allClients[0].broadcastToClients("All players ready. Starting the game now. Good luck, have fun!");
     }
 
-    private static void checkConnectionAllowed() {
-        // TODO Auto-generated method stub
+    private static boolean checkReady() {
+        // if all connected are ready, prevent additional connections
+        int counter = 0;
+        for (int i = 0; i < MAX_PLAYERS; i++) {
+           if(ready[i])
+               counter++;
+        }
         
+        if(counter == MAX_PLAYERS)
+            return true;
+        return false;
     }
 }
-
-// connections allowed - int of num players not ready
-
-//don't start game (don't send player names) until AT LEAST 2 PLAYERS have connected and ALL connected players are ready

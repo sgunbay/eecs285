@@ -1,13 +1,11 @@
 package com.eecs285.siegegame;
 
 public class ActionParser {
-    
+
     private String input;
-    
+
     ActionParser(String in) {
         input = in;
-        //for(int i = 0; i < input.length(); i++)
-        //    System.out.println("i = " + i + ": " + input.charAt(i));
     }
 
     public static enum ActionType {
@@ -27,13 +25,15 @@ public class ActionParser {
         PLAYER_WINS,
         END_TURN,
         NAME_CHANGE,
-        IS_READY
+        IS_READY,
+        WAITING_FOR_PLAYERS,
+        STARTING_GAME
     }
 
     ActionType getActionType() {
         // returns the action type present in the input string
-        // Army ActionTypes        
-        
+        // Army ActionTypes
+
         if (input.contains("attacks") && input.contains("army"))
             return ActionType.ATTACK_ARMY;
         else if (input.contains("attacks") && input.contains("city"))
@@ -70,25 +70,45 @@ public class ActionParser {
             return ActionType.PLAYER_DEFEATED;
         else if (input.contains("ends turn"))
             return ActionType.END_TURN;
-        else if(input.contains("changed their name to"))
+        else if (input.contains("changed their name to"))
             return ActionType.NAME_CHANGE;
-        else if(input.contains("is ready"))
+        else if (input.contains("is ready"))
             return ActionType.IS_READY;
+        else if (input.contains("Waiting for all players to be ready"))
+            return ActionType.WAITING_FOR_PLAYERS;
+        else if (input.contains("Starting game"))
+            return ActionType.STARTING_GAME;
 
         return null;
-    }
+    }    
+    
 
     Coord getFirstCoordinate() {
         // returns the first set of coordinates in the input string
+        return getCoordinate(input);
+    }
 
+    Coord getSecondCoordinate() {
+        // returns the second set of coordinates from input, or null
+        // if there is only 1 pair
+
+        // eliminate the beginning part of the string that contains coordinates
+        int endFirstCoord = input.indexOf(')');
+        String temp = input.substring(endFirstCoord + 1);
+
+        // use getFirstCoordinate function to get the remaining coordinates
+        return getCoordinate(temp);
+    }
+
+    private Coord getCoordinate(String in) {
         // if string doesn't contain parentheses, return null
-        if (!(input.contains("(") && input.contains(")")))
+        if (!(in.contains("(") && in.contains(")")))
             return null;
 
         // get substring of coordinates
-        int beginCoords = input.indexOf('(');
-        int endCoords = input.indexOf(')');
-        String temp = input.substring(beginCoords + 1, endCoords);
+        int beginCoords = in.indexOf('(');
+        int endCoords = in.indexOf(')');
+        String temp = in.substring(beginCoords + 1, endCoords);
 
         // split at comma to separate row and column values
         String[] coords = temp.split(",");
@@ -104,57 +124,63 @@ public class ActionParser {
 
         int row = Integer.parseInt(coords[0]);
         int col = Integer.parseInt(coords[1]);
-        
+
         return (new Coord(row, col));
     }
 
-    Coord getSecondCoordinate() {
-        // returns the second set of coordinates from input, or null
-        // if there is only 1 pair
-
-        // eliminate the beginning part of the string that contains coordinates
-        int endFirstCoord = input.indexOf(')');
-        input = input.substring(endFirstCoord + 1);
-
-        // use getFirstCoordinate function to get the remaining coordinates
-        return getFirstCoordinate();
-    }
-    
-    Player getFirstPlayer() {
+    int getFirstPlayer() {
         // This player's name is always at beginning of string
         String[] words = input.split(" ");
-        String pName = words[0];
+        return getPlayerIndex(words[0]);
         
+        /*
+        String pName = words[0];
+
         // if string contains "Player's" instead of "Player", remove the 's
         int nameLength = words[0].length();
-        if(words[0].charAt(nameLength - 2) == '\'') //need to escape ' mark
+        if (words[0].charAt(nameLength - 2) == '\'') // need to escape ' mark
             words[0] = words[0].substring(0, nameLength - 2);
-        
-        
-        System.out.println("in getFirstPlayer");
-        for(int i = 0; i < Server.MAX_PLAYERS; i++) {
-            if(Siege.players[i] != null && Siege.players[i].name == pName)
-                 return Siege.players[i];
+
+        for (int i = 0; i < Server.MAX_PLAYERS; i++) {
+            if (Siege.players[i] != null && Siege.players[i].name == pName)
+                return i;
         }
-        return null;
+        return -1;*/
+    }
+
+    int getSecondPlayer() {
+        // 2nd name is always after 'attacks' word
+        int startIndex = input.indexOf("attacks") + "attacks".length() + 1;
+        String temp = input.substring(startIndex, input.length());
+        
+        String[] words = temp.split(" ");
+        return getPlayerIndex(words[0]);               
+    }
+    
+    int getPlayerIndex(String pName) {
+     // if string contains "Player's" instead of "Player", remove the 's
+        int nameLength = pName.length();
+        if (pName.charAt(nameLength - 2) == '\'') // need to escape ' mark
+            pName = pName.substring(0, nameLength - 2);
+
+        for (int i = 0; i < Server.MAX_PLAYERS; i++) {
+            if (Siege.players[i] != null && Siege.players[i].name == pName)
+                return i;
+        }
+        return -1;
     }
 }
 
-
-
 /*
-Narration mode
-Start game
-Announce player, turn #
-Player trained unit in city coord (x, y)
-Player moved army from coord (x1, y1) to (x2, y2)
-Player merged army at coord (x1, y1) with (x2, y2)
-Player's army at (x1, y1) attacks player's army/city at (x2, y2)
-Player's army loses units
-Player captures resource/city at coord (x, y)
-Player's city at coord (x, y) is under siege/liberated
-Player's resource at coord (x, y) is under conflict/recaptured
-Player is defeated
-Player wins
-Player ends turn
-*/
+ * Narration mode 
+ * Start game 
+ * Announce player, turn # 
+ * Player trained unit in city coord (x, y) 
+ * Player moved army from coord (x1, y1) to (x2, y2) 
+ * Player merged army at coord (x1, y1) with (x2, y2) 
+ * Player's army at (x1, y1) attacks player's army/city at (x2, y2)
+ * Player's army loses units Player captures
+ * resource/city at coord (x, y) Player's city at coord (x, y) is under
+ * siege/liberated Player's resource at coord (x, y) is under
+ * conflict/recaptured Player is defeated Player wins Player ends turn
+ */

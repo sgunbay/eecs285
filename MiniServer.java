@@ -47,8 +47,6 @@ public class MiniServer extends Thread {
                         usableData += data.charAt(i);
                 }
 
-                System.out.println("usableData = " + usableData);
-
                 // if client is trying to send player name
                 if (usableData.contains("NAME")) {
                     usableData = usableData.substring(4);
